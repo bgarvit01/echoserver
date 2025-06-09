@@ -1,15 +1,21 @@
-# Echo Server (Python)
+# HTTP Echo Server
 
-A simple TCP echo server written in Python.
+A full-featured HTTP Echo Server in Python.
 
 ## Features
-- Handles TCP connections
-- Echoes received data
-- Simple logging
+- Supports GET, POST, PUT, PATCH, DELETE
+- Echo request metadata (headers, query, body, IP)
+- Control response using:
+  - `echo_code`, `X-ECHO-CODE`
+  - `echo_body`, `X-ECHO-BODY`
+  - `echo_env_body`, `X-ECHO-ENV-BODY`
+  - `echo_header`, `X-ECHO-HEADER`
+  - `echo_time`, `X-ECHO-TIME`
+  - `echo_file`, `X-ECHO-FILE`
 
 ## Run
 ```bash
-python run_server.py
+python run_server.py --port 8000
 ```
 
 ## Test
