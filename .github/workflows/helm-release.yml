@@ -6,6 +6,9 @@ on:
       - 'v*'
   # Allow this workflow to be called by other workflows
   workflow_call:
+    secrets:
+      GITHUB_TOKEN:
+        required: true
 
 jobs:
   release:
@@ -28,5 +31,7 @@ jobs:
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
+        with:
+          charts_dir: helm
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
