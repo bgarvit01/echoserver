@@ -226,7 +226,7 @@ kubectl logs -l app=echo-server --timestamps=true
 kubectl logs -l app=echo-server --since=1h
 ```
 
-## Helm Configuration
+## Advanced Configuration
 
 ### Values File
 ```yaml

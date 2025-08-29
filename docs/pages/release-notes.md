@@ -9,7 +9,7 @@ nav_order: 4
 ## Version 2.0.0 (Latest)
 
 ### 🚀 New Features
-- **Complete deployment support** - Docker, Docker Compose, Kubernetes, and Helm
+- **Complete deployment support** - Docker, Docker Compose, and Kubernetes
 - **Duplicate header support** - Multiple headers with same name (e.g., Set-Cookie)
 - **Modular architecture** - Refactored for better maintainability
 - **Enhanced security** - Non-root containers, security contexts, resource limits
@@ -33,7 +33,7 @@ nav_order: 4
 - **Docker** - Multi-stage builds, security best practices
 - **Docker Compose** - Development, production, and override configurations
 - **Kubernetes** - Complete manifests with security contexts
-- **Helm** - Full-featured chart with customizable values
+
 
 ### 🔐 Security Features
 - **Non-root execution** - UID 1000 in containers
@@ -45,7 +45,7 @@ nav_order: 4
 ### 🧪 Testing
 - **Comprehensive test suite** - 22 tests covering all features
 - **CI/CD ready** - GitHub Actions for documentation
-- **Validation tools** - kubectl dry-run, helm lint support
+- **Validation tools** - kubectl dry-run support
 
 ## Version 1.0.0
 
@@ -112,7 +112,7 @@ nav_order: 4
 ### Supported Versions
 - **Docker**: 20.10+
 - **Kubernetes**: 1.19+
-- **Helm**: 3.0+
+
 - **Python**: 3.9+
 
 ### Supported Platforms

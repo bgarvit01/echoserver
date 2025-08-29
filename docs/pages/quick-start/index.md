@@ -15,7 +15,7 @@ Choose your deployment platform:
 - [Docker](docker) - Single container deployment
 - [Docker Compose](docker-compose) - Multi-environment setup
 - [Kubernetes](kubernetes) - Production-ready orchestration
-- [Helm](helm) - Kubernetes package management
+
 
 ## Prerequisites
 
@@ -29,8 +29,7 @@ Before you begin, ensure you have the required tools installed for your chosen d
 - Kubernetes cluster 1.19+
 - kubectl configured for your cluster
 
-### For Helm
-- Helm 3.0+
+
 - Kubernetes cluster access
 
 ## Basic Testing

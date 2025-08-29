@@ -16,7 +16,7 @@ HTTP request/response service for testing and debugging
 
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
-![Helm](https://img.shields.io/badge/Helm-0F1689?style=for-the-badge&logo=Helm&labelColor=0F1689)
+
 
 An echo server is a server that replicates the request sent by the client and sends it back.
 
@@ -51,13 +51,17 @@ kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s
 kubectl port-forward -n echo-server service/echo-server-service 80:80
 ```
 
-### Helm
-```bash
-# Install with Helm
-helm install my-echo-server ./helm/echo-server
+### Kubernetes
 
-# Install with custom values
-helm install my-echo-server ./helm/echo-server -f examples/production-values.yaml
+```bash
+# Quick deployment
+kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echo-server-all.yaml
+
+# With custom configuration
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
 ```
 
 ## Example Usage
@@ -130,7 +134,7 @@ curl http://localhost:80/?echo_time=2000
 
 ## About the Project
 
-Echo Server is a comprehensive HTTP testing tool built in Python, providing enterprise-grade deployment options including Docker, Kubernetes, and Helm support.
+Echo Server is a comprehensive HTTP testing tool built in Python, providing enterprise-grade deployment options including Docker and Kubernetes support.
 
 ### Contributing
 

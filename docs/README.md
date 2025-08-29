@@ -39,7 +39,7 @@ docs/
 │   │   ├── docker.md
 │   │   ├── docker-compose.md
 │   │   ├── kubernetes.md
-│   │   └── helm.md
+
 │   └── configuration/    # Configuration docs
 │       ├── index.md
 │       ├── feature-toggle.md
