@@ -3,6 +3,9 @@ source "https://rubygems.org"
 # GitHub Pages compatible Jekyll setup
 gem "github-pages", group: :jekyll_plugins
 
+# Jekyll plugins for just-the-docs theme
+gem "jekyll-remote-theme"
+
 # Windows and JRuby support
 platforms :mingw, :x64_mingw, :mswin, :jruby do
   gem "tzinfo", ">= 1", "< 3"
