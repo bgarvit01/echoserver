@@ -38,7 +38,7 @@ jobs:
           body: |
             ## What's Changed
             
-            - Docker image: `YOURDOCKERHUBUSERNAME/echoserver:${{ github.ref_name }}`
+            - Docker image: `garvitbhateja/echoserver:${{ github.ref_name }}`
             - Helm chart: `helm repo add echo-server https://YOURUSERNAME.github.io/echoserver && helm install my-echo-server echo-server/echo-server`
             - Documentation: https://YOURUSERNAME.github.io/echoserver/
             
@@ -46,7 +46,7 @@ jobs:
             
             ### Docker
             ```bash
-            docker run -p 80:80 YOURDOCKERHUBUSERNAME/echoserver:${{ github.ref_name }}
+            docker run -p 80:80 garvitbhateja/echoserver:${{ github.ref_name }}
             ```
             
             ### Kubernetes

@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: YOURDOCKERHUBUSERNAME/echoserver
+  IMAGE_NAME: garvitbhateja/echoserver
 
 jobs:
   build:
