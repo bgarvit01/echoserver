@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: echo-server
+  name: echoserver
   labels:
-    name: echo-server
-    app: echo-server
+    name: echoserver
+    app: echoserver

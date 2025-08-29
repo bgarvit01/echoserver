@@ -136,15 +136,15 @@ docker run -p 80:80 \
   -e COMMANDS__HTTPBODY__HEADER=x-response \
   -e COMMANDS__HTTPCODE__QUERY=code \
   -e COMMANDS__HTTPCODE__HEADER=x-code \
-  echo-server:latest
+  echoserver:latest
 ```
 
 ### Docker Compose
 ```yaml
 version: "3.8"
 services:
-  echo-server:
-    image: echo-server:latest
+  echoserver:
+    image: echoserver:latest
     environment:
       - COMMANDS__HTTPBODY__QUERY=body
       - COMMANDS__HTTPBODY__HEADER=x-body
@@ -161,7 +161,7 @@ services:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: echo-server-commands
+  name: echoserver-commands
 data:
   COMMANDS__HTTPBODY__QUERY: "response_body"
   COMMANDS__HTTPBODY__HEADER: "x-response-body"
@@ -185,18 +185,18 @@ spec:
   template:
     spec:
       containers:
-      - name: echo-server
+      - name: echoserver
         envFrom:
         - configMapRef:
-            name: echo-server-commands
+            name: echoserver-commands
 ```
 
 ### Update Commands at Runtime
 ```bash
 # Update ConfigMap
-kubectl patch configmap echo-server-commands -p '{"data":{"COMMANDS__HTTPBODY__QUERY":"new_body"}}'
+kubectl patch configmap echoserver-commands -p '{"data":{"COMMANDS__HTTPBODY__QUERY":"new_body"}}'
 
 # Restart deployment to pick up changes
-kubectl rollout restart deployment/echo-server
+kubectl rollout restart deployment/echoserver
 ```
 

@@ -1,10 +1,10 @@
 # Production Helm values for Echo Server
-# Use with: helm install echo-server ./helm/echo-server -f examples/production-values.yaml
+# Use with: helm install echoserver ./helm/echoserver -f examples/production-values.yaml
 
 replicaCount: 5
 
 image:
-  repository: echo-server
+  repository: echoserver
   pullPolicy: IfNotPresent
   tag: "latest"
 
@@ -23,7 +23,7 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: echo-server-tls
+    - secretName: echoserver-tls
       hosts:
         - echo.yourdomain.com
 
@@ -88,5 +88,5 @@ affinity:
           - key: app.kubernetes.io/name
             operator: In
             values:
-            - echo-server
+            - echoserver
         topologyKey: kubernetes.io/hostname

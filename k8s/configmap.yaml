@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: echo-server-config
-  namespace: echo-server
+  name: echoserver-config
+  namespace: echoserver
   labels:
-    app: echo-server
+    app: echoserver
 data:
   PORT: "80"
   LOGS__LEVEL: "info"

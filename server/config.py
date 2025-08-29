@@ -76,7 +76,7 @@ class FeatureFlags:
 @dataclass
 class LoggingConfig:
     """Logging configuration."""
-    app_name: str = "echo-server"
+    app_name: str = "echoserver"
     level: LogLevel = LogLevel.DEBUG
     format: LogFormat = LogFormat.DEFAULT
     
@@ -177,7 +177,7 @@ class ConfigurationManager:
         
         # Logging configuration
         logging_config = LoggingConfig(
-            app_name=os.getenv('LOGS__APP', 'echo-server'),
+            app_name=os.getenv('LOGS__APP', 'echoserver'),
             level=get_env_enum('LOGS__LEVEL', LogLevel, LogLevel.DEBUG),
             format=get_env_enum('LOGS__FORMAT', LogFormat, LogFormat.DEFAULT),
         )

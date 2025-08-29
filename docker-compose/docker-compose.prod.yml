@@ -1,8 +1,8 @@
 version: "3.8"
 
 services:
-  echo-server:
-    image: echo-server:latest
+  echoserver:
+    image: echoserver:latest
     ports:
       - "80:80"
     environment:

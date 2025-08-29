@@ -5,20 +5,20 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: echo-server-prod
+  name: echoserver-prod
   labels:
-    name: echo-server-prod
-    app: echo-server
+    name: echoserver-prod
+    app: echoserver
     environment: production
 
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: echo-server-config
-  namespace: echo-server-prod
+  name: echoserver-config
+  namespace: echoserver-prod
   labels:
-    app: echo-server
+    app: echoserver
     environment: production
 data:
   LOGS__LEVEL: "info"
@@ -36,10 +36,10 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: echo-server
-  namespace: echo-server-prod
+  name: echoserver
+  namespace: echoserver-prod
   labels:
-    app: echo-server
+    app: echoserver
     version: v2.0.0
     environment: production
 spec:
@@ -51,11 +51,11 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      app: echo-server
+      app: echoserver
   template:
     metadata:
       labels:
-        app: echo-server
+        app: echoserver
         version: v2.0.0
         environment: production
       annotations:
@@ -63,7 +63,7 @@ spec:
         prometheus.io/port: "80"
         prometheus.io/path: "/"
     spec:
-      serviceAccountName: echo-server
+      serviceAccountName: echoserver
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -71,7 +71,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       containers:
-      - name: echo-server
+      - name: echoserver
         image: garvitbhateja/echoserver:latest
         imagePullPolicy: IfNotPresent
         ports:
@@ -80,7 +80,7 @@ spec:
           protocol: TCP
         envFrom:
         - configMapRef:
-            name: echo-server-config
+            name: echoserver-config
         env:
         - name: HOST
           value: "0.0.0.0"
@@ -127,26 +127,26 @@ spec:
                 - key: app
                   operator: In
                   values:
-                  - echo-server
+                  - echoserver
               topologyKey: kubernetes.io/hostname
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: echo-server
-  namespace: echo-server-prod
+  name: echoserver
+  namespace: echoserver-prod
   labels:
-    app: echo-server
+    app: echoserver
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: echo-server-service
-  namespace: echo-server-prod
+  name: echoserver
+  namespace: echoserver-prod
   labels:
-    app: echo-server
+    app: echoserver
     environment: production
 spec:
   type: ClusterIP
@@ -156,16 +156,16 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: echo-server
+    app: echoserver
 
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: echo-server-ingress
-  namespace: echo-server-prod
+  name: echoserver-ingress
+  namespace: echoserver-prod
   labels:
-    app: echo-server
+    app: echoserver
     environment: production
   annotations:
     kubernetes.io/ingress.class: nginx
@@ -178,7 +178,7 @@ spec:
   tls:
   - hosts:
     - echo.yourdomain.com
-    secretName: echo-server-tls
+    secretName: echoserver-tls
   rules:
   - host: echo.yourdomain.com
     http:
@@ -187,7 +187,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: echo-server-service
+            name: echoserver
             port:
               number: 80
 
@@ -195,15 +195,15 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: echo-server-hpa
-  namespace: echo-server-prod
+  name: echoserver-hpa
+  namespace: echoserver-prod
   labels:
-    app: echo-server
+    app: echoserver
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: echo-server
+    name: echoserver
   minReplicas: 2
   maxReplicas: 10
   metrics:

@@ -58,7 +58,7 @@ cd docker-compose
 docker-compose -f docker-compose.prod.yml up -d
 
 # Scale to multiple replicas
-docker-compose -f docker-compose.prod.yml up -d --scale echo-server=5
+docker-compose -f docker-compose.prod.yml up -d --scale echoserver=5
 ```
 
 ### Production Features
@@ -86,7 +86,7 @@ Create a `docker-compose.override.yml` file for local customizations:
 version: "3.8"
 
 services:
-  echo-server:
+  echoserver:
     ports:
       - "8080:80"  # Use different port
     environment:
@@ -148,7 +148,7 @@ curl http://localhost:80/?echo_file=/tmp
 curl http://localhost:80/?echo_env_body=HOSTNAME
 
 # View detailed logs
-docker-compose -f docker-compose.dev.yml logs -f echo-server
+docker-compose -f docker-compose.dev.yml logs -f echoserver
 ```
 
 ### Production Deployment
@@ -157,7 +157,7 @@ docker-compose -f docker-compose.dev.yml logs -f echo-server
 docker-compose -f docker-compose.prod.yml up -d
 
 # Scale to 5 replicas
-docker-compose -f docker-compose.prod.yml up -d --scale echo-server=5
+docker-compose -f docker-compose.prod.yml up -d --scale echoserver=5
 
 # Check service health
 docker-compose -f docker-compose.prod.yml ps
@@ -176,7 +176,7 @@ All configurations include health checks:
 docker-compose ps
 
 # View health check logs
-docker-compose logs echo-server | grep health
+docker-compose logs echoserver | grep health
 ```
 
 ## Scaling
@@ -184,10 +184,10 @@ docker-compose logs echo-server | grep health
 ### Manual Scaling
 ```bash
 # Scale up
-docker-compose up -d --scale echo-server=3
+docker-compose up -d --scale echoserver=3
 
 # Scale down
-docker-compose up -d --scale echo-server=1
+docker-compose up -d --scale echoserver=1
 ```
 
 ### Load Balancing
@@ -195,7 +195,7 @@ When scaling, Docker Compose automatically load balances between replicas:
 
 ```bash
 # Start multiple replicas
-docker-compose -f docker-compose.prod.yml up -d --scale echo-server=3
+docker-compose -f docker-compose.prod.yml up -d --scale echoserver=3
 
 # Test load balancing
 for i in {1..10}; do
@@ -208,7 +208,7 @@ done
 ### Service Won't Start
 ```bash
 # Check logs
-docker-compose logs echo-server
+docker-compose logs echoserver
 
 # Check configuration
 docker-compose config
@@ -226,7 +226,7 @@ lsof -i :80
 echo "
 version: '3.8'
 services:
-  echo-server:
+  echoserver:
     ports:
       - '8080:80'
 " > docker-compose.override.yml

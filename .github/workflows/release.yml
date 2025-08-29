@@ -46,7 +46,7 @@ jobs:
             ### Kubernetes
             ```bash
             # Apply all-in-one manifest
-            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/echo-server-all.yaml
+            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/echoserver-all.yaml
             
             # Or apply individual manifests
             kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/namespace.yaml
@@ -56,7 +56,7 @@ jobs:
             kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/ingress.yaml
             
             # Access the service
-            kubectl port-forward -n echo-server service/echo-server 8080:80
+            kubectl port-forward -n echoserver service/echoserver 8080:80
             # Then visit: http://localhost:8080
             ```
           draft: false

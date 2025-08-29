@@ -36,7 +36,7 @@ Available:
 ### Docker
 ```bash
 # Run with Docker
-docker run -p 80:80 echo-server:latest
+docker run -p 80:80 echoserver:latest
 
 # Test the server
 curl http://localhost:80
@@ -45,17 +45,17 @@ curl http://localhost:80
 ### Kubernetes
 ```bash
 # Quick deployment
-kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echo-server-all.yaml
+kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echoserver-all.yaml
 
 # Port forward for testing
-kubectl port-forward -n echo-server service/echo-server-service 80:80
+kubectl port-forward -n echoserver service/echoserver 80:80
 ```
 
 ### Kubernetes
 
 ```bash
 # Quick deployment
-kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echo-server-all.yaml
+kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echoserver-all.yaml
 
 # With custom configuration
 kubectl apply -f k8s/namespace.yaml
@@ -101,11 +101,11 @@ curl http://localhost:80/?echo_time=2000
 ```json
 {
   "host": {
-    "hostname": "echo-server-7d4c8c4f8b-xyz",
+    "hostname": "echoserver-7d4c8c4f8b-xyz",
     "ip": "10.244.0.123",
     "ips": ["10.244.0.123"],
     "os": {
-      "hostname": "echo-server-7d4c8c4f8b-xyz",
+      "hostname": "echoserver-7d4c8c4f8b-xyz",
       "type": "Linux",
       "platform": "linux",
       "architecture": "x64",

@@ -31,8 +31,8 @@ jobs:
     
     - name: Test Docker build
       run: |
-        docker build -t test-echo-server .
-        docker run -d -p 8080:80 --name test-container test-echo-server
+        docker build -t test-echoserver .
+        docker run -d -p 8080:80 --name test-container test-echoserver
         sleep 5
         curl -f http://localhost:8080 || exit 1
         docker stop test-container

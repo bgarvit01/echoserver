@@ -40,7 +40,7 @@ All controls support both query parameters and HTTP headers:
 - `CONTROLS__TIMES__MAX`: Maximum delay in ms (default: 60000)
 
 **Logging:**
-- `LOGS__APP`: Application name (default: echo-server)
+- `LOGS__APP`: Application name (default: echoserver)
 - `LOGS__LEVEL`: Log level - debug, info, warning, error (default: debug)
 - `LOGS__FORMAT`: Log format - default, line, object (default: default)
 
@@ -231,24 +231,24 @@ Default JSON response includes:
 #### Build and Run
 ```bash
 # Build the image
-docker build -t echo-server .
+docker build -t echoserver .
 
 # Run with default settings
-docker run -p 80:80 echo-server
+docker run -p 80:80 echoserver
 
 # Run with custom configuration
 docker run -p 8080:80 \
   -e LOGS__LEVEL=info \
   -e LOGS__FORMAT=object \
   -e ENABLE_FILE=false \
-  echo-server
+  echoserver
 ```
 
 #### Pre-built Images
 ```bash
 # Pull and run (replace with your registry)
-docker pull your-registry/echo-server:latest
-docker run -p 80:80 your-registry/echo-server:latest
+docker pull your-registry/echoserver:latest
+docker run -p 80:80 your-registry/echoserver:latest
 ```
 
 ### Docker Compose
@@ -270,7 +270,7 @@ cd docker-compose
 docker-compose -f docker-compose.prod.yml up -d
 
 # Scale to multiple replicas
-docker-compose -f docker-compose.prod.yml up -d --scale echo-server=5
+docker-compose -f docker-compose.prod.yml up -d --scale echoserver=5
 ```
 
 ### Kubernetes
@@ -278,11 +278,11 @@ docker-compose -f docker-compose.prod.yml up -d --scale echo-server=5
 #### Quick Deploy
 ```bash
 # Deploy everything at once
-curl -sL https://raw.githubusercontent.com/yourrepo/echoserver/main/k8s/echo-server-all.yaml | kubectl apply -f -
+curl -sL https://raw.githubusercontent.com/yourrepo/echoserver/main/k8s/echoserver-all.yaml | kubectl apply -f -
 
 # Or download and customize
-wget https://raw.githubusercontent.com/yourrepo/echoserver/main/k8s/echo-server-all.yaml
-kubectl apply -f echo-server-all.yaml
+wget https://raw.githubusercontent.com/yourrepo/echoserver/main/k8s/echoserver-all.yaml
+kubectl apply -f echoserver-all.yaml
 ```
 
 #### Step by Step
@@ -298,7 +298,7 @@ kubectl apply -f k8s/ingress.yaml
 #### Access the Service
 ```bash
 # Port forward for testing
-kubectl port-forward -n echo-server service/echo-server-service 80:80
+kubectl port-forward -n echoserver service/echoserver 80:80
 
 # Or via ingress (add to /etc/hosts: <ingress-ip> echo.local)
 curl http://echo.local
@@ -309,14 +309,14 @@ curl http://echo.local
 #### Install from Repository
 ```bash
 # Add helm repository (replace with your helm repo)
-helm repo add echo-server https://your-charts-repo/
+helm repo add echoserver https://your-charts-repo/
 helm repo update
 
 # Install with default values
-helm install my-echo-server echo-server/echo-server
+helm install my-echoserver echoserver/echoserver
 
 # Install with custom values
-helm install my-echo-server echo-server/echo-server \
+helm install my-echoserver echoserver/echoserver \
   --set replicaCount=5 \
   --set echoServer.logs.level=info \
   --set ingress.enabled=true \
@@ -326,13 +326,13 @@ helm install my-echo-server echo-server/echo-server \
 #### Install from Local Charts
 ```bash
 # Install from local helm chart
-helm install my-echo-server ./helm/echo-server
+helm install my-echoserver ./helm/echoserver
 
 # Install with custom values file
-helm install my-echo-server ./helm/echo-server -f my-values.yaml
+helm install my-echoserver ./helm/echoserver -f my-values.yaml
 
 # Upgrade existing installation
-helm upgrade my-echo-server ./helm/echo-server
+helm upgrade my-echoserver ./helm/echoserver
 ```
 
 #### Helm Configuration Examples

@@ -58,11 +58,11 @@ Response with host info:
 ```json
 {
   "host": {
-    "hostname": "echo-server-123",
+    "hostname": "echoserver-123",
     "ip": "10.244.0.5",
     "ips": ["10.244.0.5"],
     "os": {
-      "hostname": "echo-server-123",
+      "hostname": "echoserver-123",
       "type": "Linux",
       "platform": "linux",
       "architecture": "x64"
@@ -226,15 +226,15 @@ docker run -p 80:80 \
   -e ENABLE_FILE=false \
   -e ENABLE_ENV=false \
   -e ENABLE_LOGS=true \
-  echo-server:latest
+  echoserver:latest
 ```
 
 ### Docker Compose
 ```yaml
 version: "3.8"
 services:
-  echo-server:
-    image: echo-server:latest
+  echoserver:
+    image: echoserver:latest
     environment:
       - ENABLE_FILE=false
       - ENABLE_ENV=false
@@ -251,7 +251,7 @@ services:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: echo-server-config
+  name: echoserver-config
 data:
   ENABLE_FILE: "false"
   ENABLE_ENV: "false"
@@ -269,9 +269,9 @@ spec:
   template:
     spec:
       containers:
-      - name: echo-server
+      - name: echoserver
         envFrom:
         - configMapRef:
-            name: echo-server-config
+            name: echoserver-config
 ```
 

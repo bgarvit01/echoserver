@@ -39,7 +39,7 @@ python run_server.py --log-level info
 
 #### Docker
 ```bash
-docker run -e LOGS__LEVEL=info echo-server:latest
+docker run -e LOGS__LEVEL=info echoserver:latest
 ```
 
 ## Log Formats
@@ -51,9 +51,9 @@ Echo Server supports three log formats optimized for different use cases.
 **Use Case:** Development and human-readable logs
 
 ```
-2024-01-15 10:30:45 - echo-server - INFO - Server starting on 127.0.0.1:80
-2024-01-15 10:30:45 - echo-server - INFO - All features enabled
-2024-01-15 10:30:46 - echo-server - INFO - GET / - 200 - 1.23ms
+2024-01-15 10:30:45 - echoserver - INFO - Server starting on 127.0.0.1:80
+2024-01-15 10:30:45 - echoserver - INFO - All features enabled
+2024-01-15 10:30:46 - echoserver - INFO - GET / - 200 - 1.23ms
 ```
 
 ### Line Format
@@ -61,9 +61,9 @@ Echo Server supports three log formats optimized for different use cases.
 **Use Case:** Single-line logs for log aggregation systems
 
 ```
-2024-01-15T10:30:45.123Z INFO echo-server Server starting on 127.0.0.1:80
-2024-01-15T10:30:45.124Z INFO echo-server All features enabled
-2024-01-15T10:30:46.456Z INFO echo-server GET / 200 1.23ms
+2024-01-15T10:30:45.123Z INFO echoserver Server starting on 127.0.0.1:80
+2024-01-15T10:30:45.124Z INFO echoserver All features enabled
+2024-01-15T10:30:46.456Z INFO echoserver GET / 200 1.23ms
 ```
 
 ### Object Format (JSON)
@@ -74,15 +74,15 @@ Echo Server supports three log formats optimized for different use cases.
 {
   "timestamp": "2024-01-15T10:30:45.123Z",
   "level": "INFO",
-  "app": "echo-server",
+  "app": "echoserver",
   "message": "Server starting on 127.0.0.1:80",
-  "host": "echo-server-pod-123",
+  "host": "echoserver-pod-123",
   "pid": 1234
 }
 {
   "timestamp": "2024-01-15T10:30:46.456Z",
   "level": "INFO",
-  "app": "echo-server",
+  "app": "echoserver",
   "message": "Request processed",
   "method": "GET",
   "path": "/",
@@ -97,7 +97,7 @@ Echo Server supports three log formats optimized for different use cases.
 Customize the application name in logs:
 
 ```bash
-export LOGS__APP=my-echo-server
+export LOGS__APP=my-echoserver
 ```
 
 ## Configuration Examples
@@ -138,7 +138,7 @@ Output:
 ```bash
 export LOGS__LEVEL=info
 export LOGS__FORMAT=object
-export LOGS__APP=echo-server
+export LOGS__APP=echoserver
 ```
 
 Perfect for Elasticsearch, Logstash, and Kibana integration.
@@ -150,15 +150,15 @@ Perfect for Elasticsearch, Logstash, and Kibana integration.
 docker run -p 80:80 \
   -e LOGS__LEVEL=info \
   -e LOGS__FORMAT=line \
-  echo-server:latest
+  echoserver:latest
 ```
 
 ### Docker Compose
 ```yaml
 version: "3.8"
 services:
-  echo-server:
-    image: echo-server:latest
+  echoserver:
+    image: echoserver:latest
     environment:
       - LOGS__LEVEL=info
       - LOGS__FORMAT=object
@@ -176,8 +176,8 @@ docker run -p 80:80 \
   -e LOGS__FORMAT=object \
   --log-driver=fluentd \
   --log-opt fluentd-address=localhost:24224 \
-  --log-opt tag="echo-server" \
-  echo-server:latest
+  --log-opt tag="echoserver" \
+  echoserver:latest
 ```
 
 ## Kubernetes Configuration
@@ -187,7 +187,7 @@ docker run -p 80:80 \
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: echo-server-logging-config
+  name: echoserver-logging-config
 data:
   LOGS__LEVEL: "info"
   LOGS__FORMAT: "object"
@@ -199,31 +199,31 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: echo-server
+  name: echoserver
 spec:
   template:
     spec:
       containers:
-      - name: echo-server
-        image: echo-server:latest
+      - name: echoserver
+        image: echoserver:latest
         envFrom:
         - configMapRef:
-            name: echo-server-logging-config
+            name: echoserver-logging-config
 ```
 
 ### Viewing Logs
 ```bash
 # View logs from all pods
-kubectl logs -l app=echo-server
+kubectl logs -l app=echoserver
 
 # Follow logs
-kubectl logs -l app=echo-server -f
+kubectl logs -l app=echoserver -f
 
 # View logs with timestamps
-kubectl logs -l app=echo-server --timestamps=true
+kubectl logs -l app=echoserver --timestamps=true
 
 # View recent logs
-kubectl logs -l app=echo-server --since=1h
+kubectl logs -l app=echoserver --since=1h
 ```
 
 ## Advanced Configuration
@@ -251,7 +251,7 @@ data:
 
 ### Override Values
 ```bash
-helm install my-echo-server ./helm/echo-server \
+helm install my-echoserver ./helm/echoserver \
   --set echoServer.logs.level=debug \
   --set echoServer.logs.format=default
 ```
@@ -266,18 +266,18 @@ helm install my-echo-server ./helm/echo-server \
   port 24224
 </source>
 
-<filter echo-server.**>
+<filter echoserver.**>
   @type parser
   key_name log
   format json
   reserve_data true
 </filter>
 
-<match echo-server.**>
+<match echoserver.**>
   @type elasticsearch
   host elasticsearch.default.svc.cluster.local
   port 9200
-  index_name echo-server-logs
+  index_name echoserver-logs
 </match>
 ```
 
@@ -287,13 +287,13 @@ helm install my-echo-server ./helm/echo-server \
 filebeat.inputs:
 - type: container
   paths:
-    - '/var/log/containers/echo-server-*.log'
+    - '/var/log/containers/echoserver-*.log'
   json.keys_under_root: true
   json.add_error_key: true
 
 output.elasticsearch:
   hosts: ["elasticsearch:9200"]
-  index: "echo-server-logs-%{+yyyy.MM.dd}"
+  index: "echoserver-logs-%{+yyyy.MM.dd}"
 ```
 
 ### Promtail Configuration (Loki)
@@ -309,13 +309,13 @@ clients:
   - url: http://loki:3100/loki/api/v1/push
 
 scrape_configs:
-- job_name: echo-server
+- job_name: echoserver
   static_configs:
   - targets:
       - localhost
     labels:
-      job: echo-server
-      __path__: /var/log/echo-server/*.log
+      job: echoserver
+      __path__: /var/log/echoserver/*.log
   pipeline_stages:
   - json:
       expressions:
@@ -345,13 +345,13 @@ Query examples for Grafana with Loki:
 
 ```promql
 # Error rate
-rate({app="echo-server"} |= "ERROR" [5m])
+rate({app="echoserver"} |= "ERROR" [5m])
 
 # Response time percentiles
-quantile_over_time(0.95, {app="echo-server"} | json | duration [5m])
+quantile_over_time(0.95, {app="echoserver"} | json | duration [5m])
 
 # Request volume
-sum(rate({app="echo-server"} | json | __error__="" [5m])) by (method)
+sum(rate({app="echoserver"} | json | __error__="" [5m])) by (method)
 ```
 
 ## Performance Considerations
@@ -398,13 +398,13 @@ python run_server.py --log-format object
 ### Missing Logs in Kubernetes
 ```bash
 # Check if logging is enabled
-kubectl get configmap echo-server-config -o yaml | grep LOGS
+kubectl get configmap echoserver-config -o yaml | grep LOGS
 
 # Check pod logs
-kubectl logs deployment/echo-server
+kubectl logs deployment/echoserver
 
 # Check log forwarding
-kubectl get pods -l app=echo-server
+kubectl get pods -l app=echoserver
 ```
 
 ### Docker Log Issues
@@ -416,7 +416,7 @@ docker logs container-name
 docker inspect container-name | grep LogConfig
 
 # Test with different log driver
-docker run --log-driver=json-file echo-server:latest
+docker run --log-driver=json-file echoserver:latest
 ```
 
 ## Best Practices

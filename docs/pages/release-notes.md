@@ -84,10 +84,10 @@ nav_order: 4
 2. **Update Docker commands:**
    ```bash
    # Old
-   docker run -p 8000:8000 echo-server
+   docker run -p 8000:8000 echoserver
    
    # New
-   docker run -p 80:80 echo-server
+   docker run -p 80:80 echoserver
    ```
 
 3. **Update Kubernetes manifests:**

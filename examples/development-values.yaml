@@ -1,10 +1,10 @@
 # Development Helm values for Echo Server
-# Use with: helm install echo-server ./helm/echo-server -f examples/development-values.yaml
+# Use with: helm install echoserver ./helm/echoserver -f examples/development-values.yaml
 
 replicaCount: 1
 
 image:
-  repository: echo-server
+  repository: echoserver
   pullPolicy: IfNotPresent
   tag: "latest"
 

@@ -27,7 +27,7 @@ Echo Server can be configured through:
 ### Logging Configuration
 - `LOGS__LEVEL` - Log level: `debug`, `info`, `warning`, `error` (default: `debug`)
 - `LOGS__FORMAT` - Log format: `default`, `line`, `object` (default: `default`)
-- `LOGS__APP` - Application name in logs (default: `echo-server`)
+- `LOGS__APP` - Application name in logs (default: `echoserver`)
 
 ### Feature Toggles
 - `ENABLE_LOGS` - Enable logging (default: `true`)

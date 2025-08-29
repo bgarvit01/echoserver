@@ -22,11 +22,11 @@ Deploy Echo Server on Kubernetes for production-ready orchestration.
 ### One-Command Deployment
 ```bash
 # Deploy everything at once
-kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echo-server-all.yaml
+kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echoserver-all.yaml
 
 # Or download and customize
-wget https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echo-server-all.yaml
-kubectl apply -f echo-server-all.yaml
+wget https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echoserver-all.yaml
+kubectl apply -f echoserver-all.yaml
 ```
 
 This deployment includes:
@@ -61,7 +61,7 @@ kubectl apply -f k8s/ingress.yaml
 ### Port Forward for Testing
 ```bash
 # Forward port for local testing
-kubectl port-forward -n echo-server service/echo-server-service 80:80
+kubectl port-forward -n echoserver service/echoserver 80:80
 
 # Test the service
 curl http://localhost:80
@@ -79,10 +79,10 @@ curl http://echo.local
 ### Via NodePort (Alternative)
 ```bash
 # Change service type to NodePort
-kubectl patch service echo-server-service -n echo-server -p '{"spec":{"type":"NodePort"}}'
+kubectl patch service echoserver -n echoserver -p '{"spec":{"type":"NodePort"}}'
 
 # Get the node port
-kubectl get service echo-server-service -n echo-server
+kubectl get service echoserver -n echoserver
 
 # Access via NodePort
 curl http://<node-ip>:<node-port>
@@ -98,8 +98,8 @@ The deployment uses a ConfigMap for configuration:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: echo-server-config
-  namespace: echo-server
+  name: echoserver-config
+  namespace: echoserver
 data:
   LOGS__LEVEL: "info"
   LOGS__FORMAT: "default"
@@ -115,13 +115,13 @@ data:
 ### Update Configuration
 ```bash
 # Edit the ConfigMap
-kubectl edit configmap echo-server-config -n echo-server
+kubectl edit configmap echoserver-config -n echoserver
 
 # Restart deployment to pick up changes
-kubectl rollout restart deployment/echo-server -n echo-server
+kubectl rollout restart deployment/echoserver -n echoserver
 
 # Check rollout status
-kubectl rollout status deployment/echo-server -n echo-server
+kubectl rollout status deployment/echoserver -n echoserver
 ```
 
 ## Scaling
@@ -129,28 +129,28 @@ kubectl rollout status deployment/echo-server -n echo-server
 ### Manual Scaling
 ```bash
 # Scale to 10 replicas
-kubectl scale deployment echo-server -n echo-server --replicas=10
+kubectl scale deployment echoserver -n echoserver --replicas=10
 
 # Check scaling status
-kubectl get deployment echo-server -n echo-server
+kubectl get deployment echoserver -n echoserver
 
 # Watch pods scaling
-kubectl get pods -n echo-server -w
+kubectl get pods -n echoserver -w
 ```
 
 ### Horizontal Pod Autoscaler
 ```bash
 # Create HPA (requires metrics-server)
-kubectl autoscale deployment echo-server -n echo-server \
+kubectl autoscale deployment echoserver -n echoserver \
   --cpu-percent=70 \
   --min=2 \
   --max=20
 
 # Check HPA status
-kubectl get hpa -n echo-server
+kubectl get hpa -n echoserver
 
 # View HPA details
-kubectl describe hpa echo-server -n echo-server
+kubectl describe hpa echoserver -n echoserver
 ```
 
 ## Monitoring
@@ -158,46 +158,46 @@ kubectl describe hpa echo-server -n echo-server
 ### View Deployment Status
 ```bash
 # Check all resources
-kubectl get all -n echo-server
+kubectl get all -n echoserver
 
 # Check deployment status
-kubectl get deployment echo-server -n echo-server -o wide
+kubectl get deployment echoserver -n echoserver -o wide
 
 # Check pod status
-kubectl get pods -n echo-server
+kubectl get pods -n echoserver
 
 # Check service endpoints
-kubectl get endpoints -n echo-server
+kubectl get endpoints -n echoserver
 ```
 
 ### View Logs
 ```bash
 # View logs from all pods
-kubectl logs -n echo-server deployment/echo-server
+kubectl logs -n echoserver deployment/echoserver
 
 # Follow logs
-kubectl logs -n echo-server deployment/echo-server -f
+kubectl logs -n echoserver deployment/echoserver -f
 
 # View logs from specific pod
-kubectl logs -n echo-server <pod-name>
+kubectl logs -n echoserver <pod-name>
 
 # View previous container logs
-kubectl logs -n echo-server <pod-name> --previous
+kubectl logs -n echoserver <pod-name> --previous
 ```
 
 ### Debugging
 ```bash
 # Describe deployment
-kubectl describe deployment echo-server -n echo-server
+kubectl describe deployment echoserver -n echoserver
 
 # Describe pod
-kubectl describe pod <pod-name> -n echo-server
+kubectl describe pod <pod-name> -n echoserver
 
 # Execute commands in pod
-kubectl exec -it <pod-name> -n echo-server -- /bin/bash
+kubectl exec -it <pod-name> -n echoserver -- /bin/bash
 
 # Check pod events
-kubectl get events -n echo-server --sort-by='.lastTimestamp'
+kubectl get events -n echoserver --sort-by='.lastTimestamp'
 ```
 
 ## Examples
@@ -205,7 +205,7 @@ kubectl get events -n echo-server --sort-by='.lastTimestamp'
 ### Test Basic Functionality
 ```bash
 # Port forward
-kubectl port-forward -n echo-server service/echo-server-service 80:80 &
+kubectl port-forward -n echoserver service/echoserver 80:80 &
 
 # Test basic echo
 curl http://localhost:80
@@ -312,35 +312,35 @@ kubectl wait --namespace ingress-nginx \
 ### Pod Issues
 ```bash
 # Check if pods are running
-kubectl get pods -n echo-server
+kubectl get pods -n echoserver
 
 # Check pod events
-kubectl describe pod <pod-name> -n echo-server
+kubectl describe pod <pod-name> -n echoserver
 
 # Check pod logs
-kubectl logs <pod-name> -n echo-server
+kubectl logs <pod-name> -n echoserver
 ```
 
 ### Service Issues
 ```bash
 # Check service
-kubectl get service echo-server-service -n echo-server
+kubectl get service echoserver -n echoserver
 
 # Check endpoints
-kubectl get endpoints echo-server-service -n echo-server
+kubectl get endpoints echoserver -n echoserver
 
 # Test service from within cluster
 kubectl run test-pod --image=curlimages/curl -it --rm -- \
-  curl echo-server-service.echo-server.svc.cluster.local
+  curl echoserver.echoserver.svc.cluster.local
 ```
 
 ### Ingress Issues
 ```bash
 # Check ingress
-kubectl get ingress -n echo-server
+kubectl get ingress -n echoserver
 
 # Describe ingress
-kubectl describe ingress echo-server-ingress -n echo-server
+kubectl describe ingress echoserver-ingress -n echoserver
 
 # Check ingress controller logs
 kubectl logs -n ingress-nginx deployment/ingress-nginx-controller
@@ -349,12 +349,12 @@ kubectl logs -n ingress-nginx deployment/ingress-nginx-controller
 ### Common Solutions
 ```bash
 # Restart deployment
-kubectl rollout restart deployment/echo-server -n echo-server
+kubectl rollout restart deployment/echoserver -n echoserver
 
 # Delete and recreate pod
-kubectl delete pod <pod-name> -n echo-server
+kubectl delete pod <pod-name> -n echoserver
 
 # Clean up and redeploy
-kubectl delete namespace echo-server
-kubectl apply -f k8s/echo-server-all.yaml
+kubectl delete namespace echoserver
+kubectl apply -f k8s/echoserver-all.yaml
 ```

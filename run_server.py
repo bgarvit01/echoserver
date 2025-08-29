@@ -72,8 +72,8 @@ Examples:
         help='Log format (default: default)'
     )
     logging_group.add_argument(
-        '--log-app-name', type=str, default='echo-server',
-        help='Application name for logs (default: echo-server)'
+        '--log-app-name', type=str, default='echoserver',
+        help='Application name for logs (default: echoserver)'
     )
     
     # Feature toggles

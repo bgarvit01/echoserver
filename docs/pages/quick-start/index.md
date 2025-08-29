@@ -38,16 +38,16 @@ Once your Echo Server is running, test it with these basic commands:
 
 ```bash
 # Basic echo
-curl http://your-echo-server/
+curl http://your-echoserver/
 
 # Custom status code
-curl -I http://your-echo-server/?echo_code=404
+curl -I http://your-echoserver/?echo_code=404
 
 # Custom body
-curl http://your-echo-server/?echo_body=hello
+curl http://your-echoserver/?echo_body=hello
 
 # Custom headers
-curl -I http://your-echo-server/?echo_header=Custom:Value
+curl -I http://your-echoserver/?echo_header=Custom:Value
 ```
 
 ## Next Steps

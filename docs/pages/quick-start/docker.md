@@ -26,24 +26,24 @@ git clone https://github.com/bgarvit01/echoserver.git
 cd echoserver
 
 # Build the image
-docker build -t echo-server:latest .
+docker build -t echoserver:latest .
 ```
 
 ### Run Container
 ```bash
 # Run with default settings (port 80)
-docker run -p 80:80 echo-server:latest
+docker run -p 80:80 echoserver:latest
 
 # Run in background
-docker run -d -p 80:80 --name echo-server echo-server:latest
+docker run -d -p 80:80 --name echoserver echoserver:latest
 ```
 
 ## Pre-built Images
 
 ```bash
 # Pull and run (replace with your registry)
-docker pull your-registry/echo-server:latest
-docker run -p 80:80 your-registry/echo-server:latest
+docker pull your-registry/echoserver:latest
+docker run -p 80:80 your-registry/echoserver:latest
 ```
 
 ## Configuration
@@ -56,7 +56,7 @@ docker run -p 80:80 \
   -e LOGS__FORMAT=object \
   -e ENABLE_FILE=false \
   -e ENABLE_ENV=false \
-  echo-server:latest
+  echoserver:latest
 ```
 
 ### Volume Mounts
@@ -65,7 +65,7 @@ docker run -p 80:80 \
 docker run -p 80:80 \
   -v /tmp:/tmp:ro \
   -e ENABLE_FILE=true \
-  echo-server:latest
+  echoserver:latest
 ```
 
 ## Health Checks
@@ -75,10 +75,10 @@ The Docker image includes built-in health checks:
 ```bash
 # Check container health
 docker ps
-docker inspect echo-server | grep Health
+docker inspect echoserver | grep Health
 
 # View health check logs
-docker logs echo-server
+docker logs echoserver
 ```
 
 ## Examples
@@ -86,7 +86,7 @@ docker logs echo-server
 ### Basic Echo
 ```bash
 # Start the server
-docker run -d -p 80:80 --name echo-server echo-server:latest
+docker run -d -p 80:80 --name echoserver echoserver:latest
 
 # Test basic functionality
 curl http://localhost:80
@@ -110,8 +110,8 @@ curl -I http://localhost:80/?echo_header=Custom:Value
 docker run -d -p 80:80 \
   -v /tmp:/tmp:ro \
   -e ENABLE_FILE=true \
-  --name echo-server \
-  echo-server:latest
+  --name echoserver \
+  echoserver:latest
 
 # List directory
 curl http://localhost:80/?echo_file=/tmp
@@ -136,7 +136,7 @@ docker run -p 80:80 \
   --read-only \
   --tmpfs /tmp \
   --security-opt=no-new-privileges \
-  echo-server:latest
+  echoserver:latest
 ```
 
 ## Troubleshooting
@@ -144,7 +144,7 @@ docker run -p 80:80 \
 ### Container Won't Start
 ```bash
 # Check logs
-docker logs echo-server
+docker logs echoserver
 
 # Check if port is available
 lsof -i :80
@@ -162,8 +162,8 @@ sudo chmod 755 /path/to/mounted/directory
 ### Network Issues
 ```bash
 # Check container networking
-docker inspect echo-server | grep IPAddress
+docker inspect echoserver | grep IPAddress
 
 # Test from inside container
-docker exec -it echo-server curl http://localhost:80
+docker exec -it echoserver curl http://localhost:80
 ```
