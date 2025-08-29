@@ -8,8 +8,8 @@ url: "https://bgarvit01.github.io"
 markdown: kramdown
 highlighter: rouge
 
-# Just the Docs theme settings
-remote_theme: just-the-docs/just-the-docs
+# Theme settings - use GitHub Pages supported theme
+theme: minima
 
 # Logo and favicon
 logo: "/assets/images/logo.png"
@@ -69,7 +69,6 @@ plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
-  - jekyll-remote-theme
 
 # Exclude files
 exclude:

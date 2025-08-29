@@ -3,8 +3,8 @@ source "https://rubygems.org"
 # Use GitHub Pages gem for compatibility
 gem "github-pages", group: :jekyll_plugins
 
-# Use remote theme for just-the-docs
-gem "just-the-docs"
+# Use GitHub Pages supported theme
+gem "minima"
 
 # Additional plugins
 group :jekyll_plugins do

@@ -7,13 +7,10 @@ permalink: /
 ---
 
 # Echo Server
-{: .fs-9 }
 
 HTTP request/response service for testing and debugging
-{: .fs-6 .fw-300 }
 
-[Get started now](#quick-start){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
-[View it on GitHub](https://github.com/bgarvit01/echoserver){: .btn .fs-5 .mb-4 .mb-md-0 }
+[Get started now](#quick-start) | [View it on GitHub](https://github.com/bgarvit01/echoserver)
 
 ---
 
