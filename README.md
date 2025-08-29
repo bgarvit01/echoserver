@@ -2,7 +2,7 @@
 
 A full-featured HTTP Echo Server in Python with comprehensive testing capabilities and advanced configuration options.
 
-📚 **[Complete Documentation](https://bgarvit01.github.io/echoserver/)** | 🐳 **[Docker Hub](https://hub.docker.com/r/bgarvit01/echoserver)** | ⚓ **[Helm Charts](https://artifacthub.io/packages/helm/bgarvit01/echo-server)**
+📚 **[Complete Documentation](https://bgarvit01.github.io/echoserver/)** | 🐳 **[Docker Hub](https://hub.docker.com/r/garvitbhateja/echoserver)** | ⚓ **[Helm Charts](https://artifacthub.io/packages/helm/bgarvit01/echo-server)**
 
 ## Features
 
