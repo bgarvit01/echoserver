@@ -7,7 +7,6 @@ url: "https://bgarvit01.github.io"
 # Build settings
 markdown: kramdown
 highlighter: rouge
-theme: just-the-docs
 
 # Just the Docs theme settings
 remote_theme: just-the-docs/just-the-docs
@@ -70,6 +69,7 @@ plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
+  - jekyll-remote-theme
 
 # Exclude files
 exclude:
