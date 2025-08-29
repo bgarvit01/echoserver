@@ -22,10 +22,10 @@ Deploy Echo Server on Kubernetes for production-ready orchestration.
 ### One-Command Deployment
 ```bash
 # Deploy everything at once
-kubectl apply -f https://raw.githubusercontent.com/yourusername/echoserver/main/k8s/echo-server-all.yaml
+kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echo-server-all.yaml
 
 # Or download and customize
-wget https://raw.githubusercontent.com/yourusername/echoserver/main/k8s/echo-server-all.yaml
+wget https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echo-server-all.yaml
 kubectl apply -f echo-server-all.yaml
 ```
 

@@ -303,7 +303,7 @@ helm upgrade my-echo-server ./helm/echo-server \
 ### Add Repository
 ```bash
 # Add Echo Server Helm repository (replace with actual repo)
-helm repo add echo-server https://yourusername.github.io/echoserver/
+helm repo add echo-server https://bgarvit01.github.io/echoserver/
 
 # Update repository
 helm repo update

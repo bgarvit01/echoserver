@@ -143,9 +143,9 @@ nav_order: 4
 
 ## Support
 
-- **GitHub Issues**: [Report bugs](https://github.com/yourusername/echoserver/issues)
-- **Documentation**: [Full documentation](https://yourusername.github.io/echoserver/)
-- **Discussions**: [Community discussions](https://github.com/yourusername/echoserver/discussions)
+- **GitHub Issues**: [Report bugs](https://github.com/bgarvit01/echoserver/issues)
+- **Documentation**: [Full documentation](https://bgarvit01.github.io/echoserver/)
+- **Discussions**: [Community discussions](https://github.com/bgarvit01/echoserver/discussions)
 
 ---
 

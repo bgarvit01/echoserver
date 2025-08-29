@@ -2,7 +2,7 @@
 
 A full-featured HTTP Echo Server in Python with comprehensive testing capabilities and advanced configuration options.
 
-📚 **[Complete Documentation](https://yourusername.github.io/echoserver/)** | 🐳 **[Docker Hub](https://hub.docker.com/r/yourusername/echoserver)** | ⚓ **[Helm Charts](https://artifacthub.io/packages/helm/yourusername/echo-server)**
+📚 **[Complete Documentation](https://bgarvit01.github.io/echoserver/)** | 🐳 **[Docker Hub](https://hub.docker.com/r/bgarvit01/echoserver)** | ⚓ **[Helm Charts](https://artifacthub.io/packages/helm/bgarvit01/echo-server)**
 
 ## Features
 
@@ -371,12 +371,12 @@ echoServer:
 
 For comprehensive documentation including deployment guides, configuration options, and examples, visit:
 
-🌐 **[https://yourusername.github.io/echoserver/](https://yourusername.github.io/echoserver/)**
+🌐 **[https://bgarvit01.github.io/echoserver/](https://bgarvit01.github.io/echoserver/)**
 
 The documentation includes:
-- [Quick Start Guides](https://yourusername.github.io/echoserver/quick-start/) - Docker, Kubernetes, Helm
-- [Configuration](https://yourusername.github.io/echoserver/configuration/) - Feature toggles, logging, commands
-- [Release Notes](https://yourusername.github.io/echoserver/pages/release-notes) - Version history and migration guides
+- [Quick Start Guides](https://bgarvit01.github.io/echoserver/quick-start/) - Docker, Kubernetes, Helm
+- [Configuration](https://bgarvit01.github.io/echoserver/configuration/) - Feature toggles, logging, commands
+- [Release Notes](https://bgarvit01.github.io/echoserver/pages/release-notes) - Version history and migration guides
 
 ## Contributing
 

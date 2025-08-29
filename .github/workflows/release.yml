@@ -39,8 +39,8 @@ jobs:
             ## What's Changed
             
             - Docker image: `garvitbhateja/echoserver:${{ github.ref_name }}`
-            - Helm chart: `helm repo add echo-server https://YOURUSERNAME.github.io/echoserver && helm install my-echo-server echo-server/echo-server`
-            - Documentation: https://YOURUSERNAME.github.io/echoserver/
+            - Helm chart: `helm repo add echo-server https://bgarvit01.github.io/echoserver && helm install my-echo-server echo-server/echo-server`
+            - Documentation: https://bgarvit01.github.io/echoserver/
             
             ## Installation
             
@@ -51,12 +51,12 @@ jobs:
             
             ### Kubernetes
             ```bash
-            kubectl apply -f https://raw.githubusercontent.com/YOURUSERNAME/echoserver/${{ github.ref_name }}/k8s/echo-server-all.yaml
+            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/echo-server-all.yaml
             ```
             
             ### Helm
             ```bash
-            helm repo add echo-server https://YOURUSERNAME.github.io/echoserver
+            helm repo add echo-server https://bgarvit01.github.io/echoserver
             helm install my-echo-server echo-server/echo-server --version ${{ github.ref_name }}
             ```
           draft: false

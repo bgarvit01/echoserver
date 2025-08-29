@@ -2,7 +2,7 @@
 title: "Echo Server"
 description: "HTTP request/response service for testing and debugging"
 baseurl: "/echoserver"
-url: "https://yourusername.github.io"
+url: "https://bgarvit01.github.io"
 
 # Build settings
 markdown: kramdown
@@ -25,7 +25,7 @@ footer_content: "Copyright &copy; 2024 Echo Server Team. Distributed by an MIT L
 # GitHub repository
 gh_edit_link: true
 gh_edit_link_text: "Edit this page on GitHub"
-gh_edit_repository: "https://github.com/yourusername/echoserver"
+gh_edit_repository: "https://github.com/bgarvit01/echoserver"
 gh_edit_branch: "main"
 gh_edit_view_mode: "tree"
 

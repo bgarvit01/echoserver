@@ -22,7 +22,7 @@ Deploy Echo Server using Docker containers.
 ### Clone and Build
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/echoserver.git
+git clone https://github.com/bgarvit01/echoserver.git
 cd echoserver
 
 # Build the image

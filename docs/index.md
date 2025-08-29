@@ -13,7 +13,7 @@ HTTP request/response service for testing and debugging
 {: .fs-6 .fw-300 }
 
 [Get started now](#quick-start){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
-[View it on GitHub](https://github.com/yourusername/echoserver){: .btn .fs-5 .mb-4 .mb-md-0 }
+[View it on GitHub](https://github.com/bgarvit01/echoserver){: .btn .fs-5 .mb-4 .mb-md-0 }
 
 ---
 
@@ -48,7 +48,7 @@ curl http://localhost:80
 ### Kubernetes
 ```bash
 # Quick deployment
-kubectl apply -f https://raw.githubusercontent.com/yourusername/echoserver/main/k8s/echo-server-all.yaml
+kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echo-server-all.yaml
 
 # Port forward for testing
 kubectl port-forward -n echo-server service/echo-server-service 80:80
