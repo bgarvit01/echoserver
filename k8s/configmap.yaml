@@ -6,6 +6,7 @@ metadata:
   labels:
     app: echo-server
 data:
+  PORT: "80"
   LOGS__LEVEL: "info"
   LOGS__FORMAT: "default"
   ENABLE_LOGS: "true"

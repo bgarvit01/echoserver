@@ -25,10 +25,7 @@ ENV PATH=/root/.local/bin:$PATH
 # Copy application code
 COPY . .
 
-# Create non-root user for security
-RUN groupadd -r echoserver && useradd -r -g echoserver echoserver
-RUN chown -R echoserver:echoserver /app
-USER echoserver
+# Run as root for port 80 binding
 
 # Expose port
 EXPOSE 80
