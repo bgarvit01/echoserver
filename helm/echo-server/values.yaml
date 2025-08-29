@@ -1,0 +1,138 @@
+# Default values for echo-server
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 5
+
+image:
+  repository: echo-server
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+    - ALL
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+  hosts:
+    - host: echo.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: echo-server-tls
+  #    hosts:
+  #      - echo.local
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 64Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Echo Server specific configuration
+echoServer:
+  # Server configuration
+  host: "0.0.0.0"
+  port: 80
+  
+  # Logging configuration
+  logs:
+    level: "info"
+    format: "default"
+    app: "echo-server"
+  
+  # Feature toggles
+  features:
+    enableLogs: true
+    enableHost: true
+    enableHttp: true
+    enableRequest: true
+    enableCookies: true
+    enableFile: false
+    enableHeader: true
+    enableEnv: false
+  
+  # Timing controls
+  controls:
+    timesMin: 0
+    timesMax: 30000
+  
+  # Custom command names (optional)
+  commands:
+    httpBodyQuery: "echo_body"
+    httpBodyHeader: "x-echo-body"
+    httpEnvBodyQuery: "echo_env_body"
+    httpEnvBodyHeader: "x-echo-env-body"
+    httpCodeQuery: "echo_code"
+    httpCodeHeader: "x-echo-code"
+    httpHeadersQuery: "echo_header"
+    httpHeadersHeader: "x-echo-header"
+    timeQuery: "echo_time"
+    timeHeader: "x-echo-time"
+    fileQuery: "echo_file"
+    fileHeader: "x-echo-file"
+
+# Health check configuration
+healthCheck:
+  enabled: true
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3

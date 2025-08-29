@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: echo-server-config
+  namespace: echo-server
+  labels:
+    app: echo-server
+data:
+  LOGS__LEVEL: "info"
+  LOGS__FORMAT: "default"
+  ENABLE_LOGS: "true"
+  ENABLE_HOST: "true"
+  ENABLE_HTTP: "true"
+  ENABLE_REQUEST: "true"
+  ENABLE_FILE: "false"
+  ENABLE_ENV: "false"
+  CONTROLS__TIMES__MAX: "30000"
