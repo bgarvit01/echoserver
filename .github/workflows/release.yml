@@ -17,6 +17,8 @@ jobs:
   helm:
     uses: ./.github/workflows/helm-release.yml
     secrets: inherit
+    permissions:
+      contents: write
     needs: [test, docker]
 
   create-release:
