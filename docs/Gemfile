@@ -1,14 +1,14 @@
 source "https://rubygems.org"
 
-# Use GitHub Pages gem for compatibility
-gem "github-pages", group: :jekyll_plugins
+# Use Jekyll directly for GitHub Actions
+gem "jekyll", "~> 4.3.0"
 
-# Use GitHub Pages supported theme
-gem "minima"
+# Use Minima theme
+gem "minima", "~> 2.5"
 
 # Additional plugins
 group :jekyll_plugins do
-  gem "jekyll-feed"
+  gem "jekyll-feed", "~> 0.12"
   gem "jekyll-sitemap"
   gem "jekyll-seo-tag"
 end
