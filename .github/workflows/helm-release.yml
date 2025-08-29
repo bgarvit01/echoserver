@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - 'v*'
+  # Allow this workflow to be called by other workflows
+  workflow_call:
 
 jobs:
   release:
