@@ -1,21 +1,12 @@
 ---
-layout: default
-title: Feature Toggle
-parent: Configuration
-nav_order: 1
+layout: page
+title: Feature Toggles
+permalink: /feature-toggle/
 ---
 
-# Feature Toggle
+# Feature Toggles
 
 Echo Server includes comprehensive feature toggles to control what information is included in responses and what functionality is available.
-
-## Table of Contents
-{: .no_toc .text-delta }
-
-1. TOC
-{:toc}
-
----
 
 ## Response Content Features
 
@@ -46,14 +37,6 @@ Includes host information such as hostname, IP addresses, and OS details.
 export ENABLE_HOST=false
 ```
 
-Response without host info:
-```json
-{
-  "http": {...},
-  "request": {...}
-}
-```
-
 Response with host info:
 ```json
 {
@@ -67,9 +50,7 @@ Response with host info:
       "platform": "linux",
       "architecture": "x64"
     }
-  },
-  "http": {...},
-  "request": {...}
+  }
 }
 ```
 
@@ -116,8 +97,7 @@ export ENABLE_COOKIES=false
 **Default:** `true`  
 **CLI:** `--enable-file` / `--disable-file`
 
-{: .warning }
-**Security Warning**: File operations allow reading files and listing directories. Disable in production environments or untrusted networks.
+> **Security Warning**: File operations allow reading files and listing directories. Disable in production environments or untrusted networks.
 
 Controls whether the `echo_file` parameter works for file and directory operations.
 
@@ -155,8 +135,7 @@ export ENABLE_HEADER=false
 **Default:** `false`  
 **CLI:** `--enable-env` / `--disable-env`
 
-{: .warning }
-**Security Warning**: Environment variables may contain sensitive information like API keys and passwords. Only enable in secure, trusted environments.
+> **Security Warning**: Environment variables may contain sensitive information like API keys and passwords. Only enable in secure, trusted environments.
 
 Controls whether environment variables are included in the response and whether `echo_env_body` parameter works.
 
@@ -210,16 +189,6 @@ export CONTROLS__TIMES__MAX=10000
 
 ## Docker Configuration
 
-### Dockerfile Environment
-```dockerfile
-ENV ENABLE_FILE=false
-ENV ENABLE_ENV=false
-ENV ENABLE_LOGS=true
-ENV ENABLE_HOST=true
-ENV ENABLE_HTTP=true
-ENV ENABLE_REQUEST=true
-```
-
 ### Docker Run
 ```bash
 docker run -p 80:80 \
@@ -259,19 +228,5 @@ data:
   ENABLE_HOST: "true"
   ENABLE_HTTP: "true"
   ENABLE_REQUEST: "true"
-```
-
-### Deployment
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-spec:
-  template:
-    spec:
-      containers:
-      - name: echoserver
-        envFrom:
-        - configMapRef:
-            name: echoserver-config
 ```
 

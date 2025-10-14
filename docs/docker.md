@@ -1,21 +1,12 @@
 ---
-layout: default
-title: Docker
-parent: Quick Start
-nav_order: 1
+layout: page
+title: Docker Deployment
+permalink: /docker/
 ---
 
-# Docker
+# Docker Deployment
 
 Deploy Echo Server using Docker containers.
-
-## Table of Contents
-{: .no_toc .text-delta }
-
-1. TOC
-{:toc}
-
----
 
 ## Build from Source
 
@@ -167,3 +158,4 @@ docker inspect echoserver | grep IPAddress
 # Test from inside container
 docker exec -it echoserver curl http://localhost:80
 ```
+

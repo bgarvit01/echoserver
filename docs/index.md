@@ -1,22 +1,18 @@
 ---
-layout: default
+layout: home
 title: Home
-nav_order: 1
-description: "Echo Server - HTTP request/response service for testing and debugging"
-permalink: /
 ---
 
 # Echo Server
 
 HTTP request/response service for testing and debugging
 
-[Get started now](#quick-start) | [View it on GitHub](https://github.com/bgarvit01/echoserver)
+[View on GitHub](https://github.com/bgarvit01/echoserver)
 
 ---
 
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
-
 
 An echo server is a server that replicates the request sent by the client and sends it back.
 
@@ -45,23 +41,10 @@ curl http://localhost:80
 ### Kubernetes
 ```bash
 # Quick deployment
-kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echoserver-all.yaml
+kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echo-server-all.yaml
 
 # Port forward for testing
 kubectl port-forward -n echoserver service/echoserver 80:80
-```
-
-### Kubernetes
-
-```bash
-# Quick deployment
-kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echoserver-all.yaml
-
-# With custom configuration
-kubectl apply -f k8s/namespace.yaml
-kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
 ```
 
 ## Example Usage
@@ -132,6 +115,16 @@ curl http://localhost:80/?echo_time=2000
 }
 ```
 
+## Documentation
+
+- [Quick Start Guide](quick-start.html)
+- [Docker Deployment](docker.html)
+- [Kubernetes Deployment](kubernetes.html)
+- [Configuration](configuration.html)
+- [Feature Toggles](feature-toggle.html)
+- [Commands Reference](commands.html)
+- [Release Notes](release-notes.html)
+
 ## About the Project
 
 Echo Server is a comprehensive HTTP testing tool built in Python, providing enterprise-grade deployment options including Docker and Kubernetes support.
@@ -147,3 +140,4 @@ Echo Server is distributed under the MIT License. See `LICENSE` for more informa
 ---
 
 Copyright © 2024 Echo Server Team.
+

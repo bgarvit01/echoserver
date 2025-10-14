@@ -1,8 +1,6 @@
 ---
-layout: default
+layout: page
 title: Configuration
-nav_order: 3
-has_children: true
 permalink: /configuration/
 ---
 
@@ -82,8 +80,8 @@ Override environment variables:
 python run_server.py --host 0.0.0.0 --port 8080 --log-level info
 ```
 
-## Next Steps
+## Additional Resources
 
-- Learn about [Feature Toggles](feature-toggle) to control functionality
-- Configure [Logging](loggers) for different environments  
-- Customize [Commands](commands) for your specific needs
+- [Feature Toggles](feature-toggle.html) - Control functionality
+- [Commands Reference](commands.html) - Customize command names
+

@@ -1,21 +1,12 @@
 ---
-layout: default
-title: Commands
-parent: Configuration
-nav_order: 3
+layout: page
+title: Commands Reference
+permalink: /commands/
 ---
 
-# Commands
+# Commands Reference
 
 Echo Server allows customization of command names and parameters for maximum flexibility in different environments.
-
-## Table of Contents
-{: .no_toc .text-delta }
-
-1. TOC
-{:toc}
-
----
 
 ## Default Commands
 
@@ -121,14 +112,6 @@ curl -H "X-Api-Response-Body: success" -H "X-Api-Response-Code: 200" http://loca
 
 ## Docker Configuration
 
-### Dockerfile
-```dockerfile
-ENV COMMANDS__HTTPBODY__QUERY=custom_body
-ENV COMMANDS__HTTPBODY__HEADER=x-custom-body
-ENV COMMANDS__HTTPCODE__QUERY=status_code
-ENV COMMANDS__HTTPCODE__HEADER=x-status-code
-```
-
 ### Docker Run
 ```bash
 docker run -p 80:80 \
@@ -175,20 +158,6 @@ data:
   COMMANDS__FILE__HEADER: "x-file-content"
   COMMANDS__HTTPENVBODY__QUERY: "env_variable"
   COMMANDS__HTTPENVBODY__HEADER: "x-env-variable"
-```
-
-### Deployment
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-spec:
-  template:
-    spec:
-      containers:
-      - name: echoserver
-        envFrom:
-        - configMapRef:
-            name: echoserver-commands
 ```
 
 ### Update Commands at Runtime

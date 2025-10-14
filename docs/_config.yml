@@ -1,117 +1,15 @@
-# Jekyll configuration for Echo Server documentation
-title: "Echo Server"
-description: "HTTP request/response service for testing and debugging"
-baseurl: "/echoserver"
+title: Echo Server
+description: HTTP request/response service for testing and debugging
 url: "https://bgarvit01.github.io"
+baseurl: "/echoserver"
+theme: minima
 
-# Build settings
 markdown: kramdown
-highlighter: rouge
+permalink: pretty
 
-# Theme settings - use GitHub Pages supported theme
-remote_theme: pmarsceill/just-the-docs
-
-# Logo and favicon
-logo: "/assets/images/logo.png"
-favicon_ico: "/assets/images/favicon.ico"
-
-# Navigation
-nav_sort: case_insensitive
-
-# Just the Docs theme settings
-search_enabled: true
-search:
-  # Split pages into sections that can be searched individually
-  heading_level: 2
-  # Maximum amount of previews per search result
-  previews: 2
-  # Maximum amount of words to display before a matched word in the preview
-  preview_words_before: 3
-  # Maximum amount of words to display after a matched word in the preview
-  preview_words_after: 3
-  # Set the search token separator
-  tokenizer_separator: /[\s\-/]+/
-  # Display the relative url in search results
-  rel_url: true
-  # Enable or disable the search button that appears in the bottom right corner of every page
-  button: false
-
-# Color scheme
-color_scheme: nil
-
-# Footer content
-footer_content: "Copyright &copy; 2024 Echo Server Team. Distributed by an MIT License."
-
-# GitHub repository
-gh_edit_link: true
-gh_edit_link_text: "Edit this page on GitHub"
-gh_edit_repository: "https://github.com/bgarvit01/echoserver"
-gh_edit_branch: "main"
-gh_edit_view_mode: "tree"
-
-# Search
-search_enabled: true
-search:
-  heading_level: 2
-  previews: 2
-  preview_words_before: 3
-  preview_words_after: 3
-  tokenizer_separator: /[\s/]+/
-  rel_url: true
-  button: false
-
-# Mermaid diagrams
-mermaid:
-  version: "9.1.3"
-
-# Code copy button
-enable_copy_code_button: true
-
-# Callouts
-callouts_level: quiet
-callouts:
-  highlight:
-    color: yellow
-  important:
-    title: Important
-    color: blue
-  new:
-    title: New
-    color: green
-  note:
-    title: Note
-    color: purple
-  warning:
-    title: Warning
-    color: red
-
-# Plugins
-plugins:
-  - jekyll-feed
-  - jekyll-sitemap
-  - jekyll-seo-tag
-  - jekyll-remote-theme
-
-# Exclude files
+# Exclude from processing
 exclude:
   - Gemfile
   - Gemfile.lock
-  - node_modules
-  - vendor
-  - .bundle
-  - .sass-cache
-  - .jekyll-cache
-  - .jekyll-metadata
   - README.md
-  - server/
-  - tests/
-  - docker-compose/
-  - k8s/
 
-  - examples/
-  - requirements.txt
-  - run_server.py
-  - Dockerfile
-  - .dockerignore
-  - .gitignore
-  - DEPLOYMENT.md

@@ -1,21 +1,12 @@
 ---
-layout: default
+layout: page
 title: Quick Start
-nav_order: 2
-has_children: true
 permalink: /quick-start/
 ---
 
 # Quick Start
 
 Get Echo Server running in minutes with your preferred deployment method.
-
-Choose your deployment platform:
-
-- [Docker](docker) - Single container deployment
-- [Docker Compose](docker-compose) - Multi-environment setup
-- [Kubernetes](kubernetes) - Production-ready orchestration
-
 
 ## Prerequisites
 
@@ -28,9 +19,6 @@ Before you begin, ensure you have the required tools installed for your chosen d
 ### For Kubernetes
 - Kubernetes cluster 1.19+
 - kubectl configured for your cluster
-
-
-- Kubernetes cluster access
 
 ## Basic Testing
 
@@ -50,11 +38,17 @@ curl http://your-echoserver/?echo_body=hello
 curl -I http://your-echoserver/?echo_header=Custom:Value
 ```
 
+## Deployment Options
+
+- [Docker Deployment](docker.html)
+- [Docker Compose Setup](docker-compose.html)
+- [Kubernetes Deployment](kubernetes.html)
+
 ## Next Steps
 
 After completing the quick start:
 
-1. Explore [Configuration](../configuration/) options
-2. Learn about [Feature Toggles](../configuration/feature-toggle)
-3. Set up [Logging](../configuration/loggers)
-4. Customize [Commands](../configuration/commands)
+1. Explore [Configuration](configuration.html) options
+2. Learn about [Feature Toggles](feature-toggle.html)
+3. Customize [Commands](commands.html)
+

@@ -1,7 +1,7 @@
 ---
-layout: default
+layout: page
 title: Release Notes
-nav_order: 4
+permalink: /release-notes/
 ---
 
 # Release Notes
@@ -33,7 +33,6 @@ nav_order: 4
 - **Docker** - Multi-stage builds, security best practices
 - **Docker Compose** - Development, production, and override configurations
 - **Kubernetes** - Complete manifests with security contexts
-
 
 ### 🔐 Security Features
 - **Non-root execution** - UID 1000 in containers
@@ -112,34 +111,12 @@ nav_order: 4
 ### Supported Versions
 - **Docker**: 20.10+
 - **Kubernetes**: 1.19+
-
 - **Python**: 3.9+
 
 ### Supported Platforms
 - **Linux**: x86_64, arm64
 - **macOS**: Intel, Apple Silicon
 - **Windows**: WSL2 recommended
-
-## Known Issues
-
-### Version 2.0.0
-- **File operations**: Large file reads may cause memory issues
-- **High concurrency**: Consider resource limits for heavy traffic
-- **Windows**: Path handling differences in file operations
-
-## Roadmap
-
-### Version 2.1.0 (Planned)
-- **Prometheus metrics** - Built-in metrics endpoint
-- **OpenAPI specification** - API documentation
-- **Performance improvements** - Response caching options
-- **Additional formats** - XML, YAML response options
-
-### Version 2.2.0 (Planned)
-- **Authentication** - Basic/Bearer token support
-- **Rate limiting** - Built-in rate limiting
-- **WebSocket support** - Echo WebSocket connections
-- **GraphQL** - GraphQL echo endpoint
 
 ## Support
 
@@ -149,9 +126,3 @@ nav_order: 4
 
 ---
 
-## Contributors
-
-- **Echo Server Team** - Core development
-- **Community Contributors** - Bug reports, feature requests, documentation
-
-Special thanks to the original [Ealenn/Echo-Server](https://ealenn.github.io/Echo-Server/) project for inspiration.
