@@ -117,13 +117,13 @@ curl http://localhost:80/?echo_time=2000
 
 ## Documentation
 
-- [Quick Start Guide](quick-start.html)
-- [Docker Deployment](docker.html)
-- [Kubernetes Deployment](kubernetes.html)
-- [Configuration](configuration.html)
-- [Feature Toggles](feature-toggle.html)
-- [Commands Reference](commands.html)
-- [Release Notes](release-notes.html)
+- [Quick Start Guide]({{ site.baseurl }}/quick-start/)
+- [Docker Deployment]({{ site.baseurl }}/docker/)
+- [Kubernetes Deployment]({{ site.baseurl }}/kubernetes/)
+- [Configuration]({{ site.baseurl }}/configuration/)
+- [Feature Toggles]({{ site.baseurl }}/feature-toggle/)
+- [Commands Reference]({{ site.baseurl }}/commands/)
+- [Release Notes]({{ site.baseurl }}/release-notes/)
 
 ## About the Project
 
@@ -138,6 +138,4 @@ When contributing to this repository, please first discuss the change you wish t
 Echo Server is distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-
-Copyright © 2024 Echo Server Team.
 

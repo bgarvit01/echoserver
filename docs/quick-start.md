@@ -40,15 +40,15 @@ curl -I http://your-echoserver/?echo_header=Custom:Value
 
 ## Deployment Options
 
-- [Docker Deployment](docker.html)
-- [Docker Compose Setup](docker-compose.html)
-- [Kubernetes Deployment](kubernetes.html)
+- [Docker Deployment]({{ site.baseurl }}/docker/)
+- [Docker Compose Setup]({{ site.baseurl }}/docker-compose/)
+- [Kubernetes Deployment]({{ site.baseurl }}/kubernetes/)
 
 ## Next Steps
 
 After completing the quick start:
 
-1. Explore [Configuration](configuration.html) options
-2. Learn about [Feature Toggles](feature-toggle.html)
-3. Customize [Commands](commands.html)
+1. Explore [Configuration]({{ site.baseurl }}/configuration/) options
+2. Learn about [Feature Toggles]({{ site.baseurl }}/feature-toggle/)
+3. Customize [Commands]({{ site.baseurl }}/commands/)
 

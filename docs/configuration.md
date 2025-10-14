@@ -82,6 +82,6 @@ python run_server.py --host 0.0.0.0 --port 8080 --log-level info
 
 ## Additional Resources
 
-- [Feature Toggles](feature-toggle.html) - Control functionality
-- [Commands Reference](commands.html) - Customize command names
+- [Feature Toggles]({{ site.baseurl }}/feature-toggle/) - Control functionality
+- [Commands Reference]({{ site.baseurl }}/commands/) - Customize command names
 
