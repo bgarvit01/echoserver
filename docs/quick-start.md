@@ -8,6 +8,26 @@ permalink: /quick-start/
 
 Get Echo Server running in minutes with your preferred deployment method.
 
+## Docker
+
+```bash
+# Run with Docker
+docker run -p 80:80 echoserver:latest
+
+# Test the server
+curl http://localhost:80
+```
+
+## Kubernetes
+
+```bash
+# Quick deployment
+kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echoserver-all.yaml
+
+# Port forward for testing
+kubectl port-forward -n echoserver service/echoserver 80:80
+```
+
 ## Prerequisites
 
 Before you begin, ensure you have the required tools installed for your chosen deployment method:
@@ -20,22 +40,72 @@ Before you begin, ensure you have the required tools installed for your chosen d
 - Kubernetes cluster 1.19+
 - kubectl configured for your cluster
 
-## Basic Testing
+## Example Usage
 
-Once your Echo Server is running, test it with these basic commands:
-
+### Basic Echo
 ```bash
-# Basic echo
-curl http://your-echoserver/
+curl http://localhost:80
+```
 
-# Custom status code
-curl -I http://your-echoserver/?echo_code=404
+### Custom Status Code
+```bash
+curl -I http://localhost:80/?echo_code=404
+```
 
-# Custom body
-curl http://your-echoserver/?echo_body=hello
+### Custom Body
+```bash
+curl http://localhost:80/?echo_body=hello
+```
 
-# Custom headers
-curl -I http://your-echoserver/?echo_header=Custom:Value
+### Custom Headers
+```bash
+curl -I http://localhost:80/?echo_header=Custom:Value
+```
+
+### Multiple Status Codes (Random)
+```bash
+curl -I http://localhost:80/?echo_code=200-400-500
+```
+
+### Response Delay
+```bash
+curl http://localhost:80/?echo_time=2000
+```
+
+## Response Format
+
+```json
+{
+  "host": {
+    "hostname": "echoserver-7d4c8c4f8b-xyz",
+    "ip": "10.244.0.123",
+    "ips": ["10.244.0.123"],
+    "os": {
+      "hostname": "echoserver-7d4c8c4f8b-xyz",
+      "type": "Linux",
+      "platform": "linux",
+      "architecture": "x64",
+      "release": "5.4.0"
+    }
+  },
+  "http": {
+    "method": "GET",
+    "baseUrl": "http://localhost:80",
+    "originalUrl": "/path?query=value",
+    "protocol": "http"
+  },
+  "request": {
+    "params": {},
+    "query": {"query": "value"},
+    "headers": {
+      "host": "localhost:80",
+      "user-agent": "curl/7.68.0"
+    },
+    "body": {},
+    "files": {}
+  },
+  "environment": {...}
+}
 ```
 
 ## Deployment Options
@@ -44,11 +114,20 @@ curl -I http://your-echoserver/?echo_header=Custom:Value
 - [Docker Compose Setup]({{ site.baseurl }}/docker-compose/)
 - [Kubernetes Deployment]({{ site.baseurl }}/kubernetes/)
 
-## Next Steps
+## Documentation
 
-After completing the quick start:
+- [Configuration]({{ site.baseurl }}/configuration/)
+- [Feature Toggles]({{ site.baseurl }}/feature-toggle/)
+- [Commands Reference]({{ site.baseurl }}/commands/)
 
-1. Explore [Configuration]({{ site.baseurl }}/configuration/) options
-2. Learn about [Feature Toggles]({{ site.baseurl }}/feature-toggle/)
-3. Customize [Commands]({{ site.baseurl }}/commands/)
+## About the Project
 
+Echo Server is a comprehensive HTTP testing tool built in Python, providing enterprise-grade deployment options including Docker and Kubernetes support.
+
+### Contributing
+
+When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
+
+### License
+
+Echo Server is distributed under the MIT License. See `LICENSE` for more information.
