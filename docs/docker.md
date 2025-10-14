@@ -1,48 +1,39 @@
 ---
 layout: page
-title: Docker Deployment
+title: Docker
 permalink: /docker/
 ---
 
 # Docker Deployment
 
-Deploy Echo Server using Docker containers.
+## Basic Usage
 
-## Build from Source
-
-### Clone and Build
 ```bash
-# Clone the repository
-git clone https://github.com/bgarvit01/echoserver.git
-cd echoserver
-
-# Build the image
-docker build -t echoserver:latest .
-```
-
-### Run Container
-```bash
-# Run with default settings (port 80)
+# Run Echo Server
 docker run -p 80:80 echoserver:latest
 
 # Run in background
 docker run -d -p 80:80 --name echoserver echoserver:latest
+
+# View logs
+docker logs -f echoserver
 ```
 
-## Pre-built Images
+## Build from Source
 
 ```bash
-# Pull and run (replace with your registry)
-docker pull your-registry/echoserver:latest
-docker run -p 80:80 your-registry/echoserver:latest
+git clone https://github.com/bgarvit01/echoserver.git
+cd echoserver
+docker build -t echoserver:latest .
+docker run -p 80:80 echoserver:latest
 ```
 
-## Configuration
+## Environment Variables
 
-### Environment Variables
 ```bash
-# Run with custom configuration
 docker run -p 80:80 \
+  -e HOST=0.0.0.0 \
+  -e PORT=80 \
   -e LOGS__LEVEL=info \
   -e LOGS__FORMAT=object \
   -e ENABLE_FILE=false \
@@ -50,77 +41,44 @@ docker run -p 80:80 \
   echoserver:latest
 ```
 
-### Volume Mounts
+### Common Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `HOST` | `127.0.0.1` | Server bind address |
+| `PORT` | `80` | Server port |
+| `LOGS__LEVEL` | `debug` | Log level (debug, info, warning, error) |
+| `LOGS__FORMAT` | `default` | Log format (default, line, object) |
+| `ENABLE_FILE` | `true` | Enable file operations |
+| `ENABLE_ENV` | `false` | Enable environment variables in response |
+
+[See all configuration options →]({{ site.baseurl }}/configuration/)
+
+## Volume Mounts
+
 ```bash
-# Mount directories for file operations
+# Mount for file operations
 docker run -p 80:80 \
   -v /tmp:/tmp:ro \
   -e ENABLE_FILE=true \
-  echoserver:latest
-```
-
-## Health Checks
-
-The Docker image includes built-in health checks:
-
-```bash
-# Check container health
-docker ps
-docker inspect echoserver | grep Health
-
-# View health check logs
-docker logs echoserver
-```
-
-## Examples
-
-### Basic Echo
-```bash
-# Start the server
-docker run -d -p 80:80 --name echoserver echoserver:latest
-
-# Test basic functionality
-curl http://localhost:80
-```
-
-### Custom Response
-```bash
-# Custom status code
-curl -I http://localhost:80/?echo_code=404
-
-# Custom body
-curl http://localhost:80/?echo_body=hello
-
-# Custom headers
-curl -I http://localhost:80/?echo_header=Custom:Value
-```
-
-### File Operations
-```bash
-# Enable file operations
-docker run -d -p 80:80 \
-  -v /tmp:/tmp:ro \
-  -e ENABLE_FILE=true \
-  --name echoserver \
   echoserver:latest
 
 # List directory
 curl http://localhost:80/?echo_file=/tmp
 ```
 
-## Security Considerations
+## Security
 
 The Docker image follows security best practices:
 
-- **Non-root user**: Runs as user ID 1000
-- **Minimal base image**: Based on Python slim image
-- **Read-only filesystem**: Where possible
-- **Dropped capabilities**: All unnecessary capabilities removed
-- **Resource limits**: Memory and CPU limits recommended
+- ✅ Non-root user (UID 1000)
+- ✅ Minimal base image (Python slim)
+- ✅ Dropped capabilities
+- ✅ Read-only filesystem support
 
 ### Production Security
+
 ```bash
-# Run with security constraints
 docker run -p 80:80 \
   --memory=128m \
   --cpus="0.5" \
@@ -130,9 +88,22 @@ docker run -p 80:80 \
   echoserver:latest
 ```
 
+## Health Checks
+
+Built-in health checks are included:
+
+```bash
+# Check container health
+docker ps
+
+# Inspect health status
+docker inspect echoserver | grep Health
+```
+
 ## Troubleshooting
 
 ### Container Won't Start
+
 ```bash
 # Check logs
 docker logs echoserver
@@ -142,20 +113,12 @@ lsof -i :80
 ```
 
 ### Permission Issues
-```bash
-# Check if volume mounts have correct permissions
-ls -la /path/to/mounted/directory
 
-# Fix permissions if needed
-sudo chmod 755 /path/to/mounted/directory
+```bash
+# Fix volume permissions
+chmod 755 /path/to/mounted/directory
 ```
 
-### Network Issues
-```bash
-# Check container networking
-docker inspect echoserver | grep IPAddress
+---
 
-# Test from inside container
-docker exec -it echoserver curl http://localhost:80
-```
-
+**Next:** [Docker Compose →]({{ site.baseurl }}/docker-compose/)

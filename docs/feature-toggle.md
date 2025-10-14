@@ -6,34 +6,36 @@ permalink: /feature-toggle/
 
 # Feature Toggles
 
-Echo Server includes comprehensive feature toggles to control what information is included in responses and what functionality is available.
+Control what information is included in responses and what functionality is available.
+
+## Table of Contents
+- [Response Content Features](#response-content-features)
+- [Functional Features](#functional-features)
+- [Security Profiles](#security-profiles)
+
+---
 
 ## Response Content Features
 
 ### Enable Logs
-**Environment Variable:** `ENABLE_LOGS`  
-**Default:** `true`  
-**CLI:** `--enable-logs` / `--disable-logs`
 
-Controls whether the server generates and includes logs in the response.
+**Variable:** `ENABLE_LOGS`  
+**Default:** `true`
+
+Controls whether the server generates and includes logs.
 
 ```bash
-# Disable logging
 export ENABLE_LOGS=false
-
-# Enable logging (default)
-export ENABLE_LOGS=true
 ```
 
 ### Enable Host Information
-**Environment Variable:** `ENABLE_HOST`  
-**Default:** `true`  
-**CLI:** `--enable-host` / `--disable-host`
 
-Includes host information such as hostname, IP addresses, and OS details.
+**Variable:** `ENABLE_HOST`  
+**Default:** `true`
+
+Includes hostname, IP addresses, and OS details.
 
 ```bash
-# Disable host info
 export ENABLE_HOST=false
 ```
 
@@ -43,122 +45,101 @@ Response with host info:
   "host": {
     "hostname": "echoserver-123",
     "ip": "10.244.0.5",
-    "ips": ["10.244.0.5"],
-    "os": {
-      "hostname": "echoserver-123",
-      "type": "Linux",
-      "platform": "linux",
-      "architecture": "x64"
-    }
+    "ips": ["10.244.0.5"]
   }
 }
 ```
 
 ### Enable HTTP Information
-**Environment Variable:** `ENABLE_HTTP`  
-**Default:** `true`  
-**CLI:** `--enable-http` / `--disable-http`
 
-Includes HTTP method, URL, and protocol information.
+**Variable:** `ENABLE_HTTP`  
+**Default:** `true`
+
+Includes HTTP method, URL, and protocol.
 
 ```bash
-# Disable HTTP info
 export ENABLE_HTTP=false
 ```
 
 ### Enable Request Details
-**Environment Variable:** `ENABLE_REQUEST`  
-**Default:** `true`  
-**CLI:** `--enable-request` / `--disable-request`
 
-Includes request parameters, query strings, headers, body, and files.
+**Variable:** `ENABLE_REQUEST`  
+**Default:** `true`
+
+Includes parameters, query strings, headers, body, and files.
 
 ```bash
-# Disable request details
 export ENABLE_REQUEST=false
 ```
 
 ### Enable Cookies
-**Environment Variable:** `ENABLE_COOKIES`  
-**Default:** `true`  
-**CLI:** `--enable-cookies` / `--disable-cookies`
 
-Includes cookie information in the response.
+**Variable:** `ENABLE_COOKIES`  
+**Default:** `true`
+
+Includes cookie information.
 
 ```bash
-# Disable cookies
 export ENABLE_COOKIES=false
 ```
+
+---
 
 ## Functional Features
 
 ### Enable File Operations
-**Environment Variable:** `ENABLE_FILE`  
-**Default:** `true`  
-**CLI:** `--enable-file` / `--disable-file`
 
-> **Security Warning**: File operations allow reading files and listing directories. Disable in production environments or untrusted networks.
+**Variable:** `ENABLE_FILE`  
+**Default:** `true`
 
-Controls whether the `echo_file` parameter works for file and directory operations.
+⚠️ **Security Warning**: File operations allow reading files and listing directories. Disable in production.
 
 ```bash
-# Disable file operations (recommended for production)
 export ENABLE_FILE=false
-```
-
-When disabled:
-```bash
-# This will return normal echo response instead of file content
-curl http://localhost:80/?echo_file=/etc/passwd
 ```
 
 When enabled:
 ```bash
-# This will return file content or directory listing
 curl http://localhost:80/?echo_file=/tmp
 ```
 
 ### Enable Custom Headers
-**Environment Variable:** `ENABLE_HEADER`  
-**Default:** `true`  
-**CLI:** `--enable-header` / `--disable-header`
 
-Controls whether custom headers can be added to responses via `echo_header`.
+**Variable:** `ENABLE_HEADER`  
+**Default:** `true`
+
+Controls custom headers via `echo_header`.
 
 ```bash
-# Disable custom headers
 export ENABLE_HEADER=false
 ```
 
 ### Enable Environment Variables
-**Environment Variable:** `ENABLE_ENV`  
-**Default:** `false`  
-**CLI:** `--enable-env` / `--disable-env`
 
-> **Security Warning**: Environment variables may contain sensitive information like API keys and passwords. Only enable in secure, trusted environments.
+**Variable:** `ENABLE_ENV`  
+**Default:** `false`
 
-Controls whether environment variables are included in the response and whether `echo_env_body` parameter works.
+⚠️ **Security Warning**: Environment variables may contain sensitive information. Only enable in secure environments.
 
 ```bash
-# Enable environment variables (use with caution)
 export ENABLE_ENV=true
 ```
 
-When enabled, responses include:
+When enabled:
 ```json
 {
   "environment": {
-    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin",
-    "HOME": "/home/user",
-    "USER": "user"
+    "PATH": "/usr/local/bin:/usr/bin",
+    "HOME": "/home/user"
   }
 }
 ```
 
-## Security Configurations
+---
 
-### Minimal Security Profile
-For maximum security in production:
+## Security Profiles
+
+### Minimal Security (Production)
 
 ```bash
 export ENABLE_FILE=false
@@ -167,8 +148,7 @@ export ENABLE_COOKIES=false
 export CONTROLS__TIMES__MAX=5000
 ```
 
-### Development Profile
-For development and testing:
+### Development
 
 ```bash
 export ENABLE_FILE=true
@@ -177,8 +157,7 @@ export ENABLE_COOKIES=true
 export LOGS__LEVEL=debug
 ```
 
-### Public Demo Profile
-For public demonstrations:
+### Public Demo
 
 ```bash
 export ENABLE_FILE=false
@@ -187,9 +166,10 @@ export ENABLE_COOKIES=true
 export CONTROLS__TIMES__MAX=10000
 ```
 
+---
+
 ## Docker Configuration
 
-### Docker Run
 ```bash
 docker run -p 80:80 \
   -e ENABLE_FILE=false \
@@ -198,24 +178,8 @@ docker run -p 80:80 \
   echoserver:latest
 ```
 
-### Docker Compose
-```yaml
-version: "3.8"
-services:
-  echoserver:
-    image: echoserver:latest
-    environment:
-      - ENABLE_FILE=false
-      - ENABLE_ENV=false
-      - ENABLE_LOGS=true
-      - ENABLE_HOST=true
-      - ENABLE_HTTP=true
-      - ENABLE_REQUEST=true
-```
-
 ## Kubernetes Configuration
 
-### ConfigMap
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -225,8 +189,8 @@ data:
   ENABLE_FILE: "false"
   ENABLE_ENV: "false"
   ENABLE_LOGS: "true"
-  ENABLE_HOST: "true"
-  ENABLE_HTTP: "true"
-  ENABLE_REQUEST: "true"
 ```
 
+---
+
+**Related:** [Configuration →]({{ site.baseurl }}/configuration/)

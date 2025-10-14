@@ -4,19 +4,18 @@ title: Docker Compose
 permalink: /docker-compose/
 ---
 
-# Docker Compose Deployment
-
-Deploy Echo Server using Docker Compose for easy multi-environment setups.
+# Docker Compose
 
 ## Basic Setup
 
-### docker-compose.yml
+Create `docker-compose.yml`:
+
 ```yaml
 version: "3.8"
 
 services:
   echoserver:
-    build: .
+    image: echoserver:latest
     ports:
       - "80:80"
     environment:
@@ -25,7 +24,8 @@ services:
     restart: unless-stopped
 ```
 
-### Start the Service
+Start the service:
+
 ```bash
 # Start in foreground
 docker-compose up
@@ -33,13 +33,16 @@ docker-compose up
 # Start in background
 docker-compose up -d
 
-# Stop the service
+# View logs
+docker-compose logs -f
+
+# Stop
 docker-compose down
 ```
 
 ## Development Configuration
 
-Create a `docker-compose.dev.yml`:
+`docker-compose.dev.yml`:
 
 ```yaml
 version: "3.8"
@@ -59,14 +62,15 @@ services:
     restart: unless-stopped
 ```
 
-### Run Development Setup
+Run:
+
 ```bash
 docker-compose -f docker-compose.dev.yml up
 ```
 
 ## Production Configuration
 
-Create a `docker-compose.prod.yml`:
+`docker-compose.prod.yml`:
 
 ```yaml
 version: "3.8"
@@ -95,31 +99,62 @@ services:
       - no-new-privileges:true
 ```
 
-### Run Production Setup
+Run:
+
 ```bash
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-## Testing
+## Multi-Environment Setup
+
+Use override files for different environments:
 
 ```bash
-# Test the service
-curl http://localhost:80
+# Base + Development
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+# Base + Production
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+```
+
+## Health Checks
+
+Add health checks to your compose file:
+
+```yaml
+services:
+  echoserver:
+    image: echoserver:latest
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+```
+
+## Commands
+
+```bash
+# Start services
+docker-compose up -d
+
+# Stop services
+docker-compose down
 
 # View logs
 docker-compose logs -f
 
 # Check status
 docker-compose ps
-```
 
-## Cleanup
+# Rebuild and restart
+docker-compose up -d --build
 
-```bash
-# Stop and remove containers
-docker-compose down
-
-# Stop, remove containers, and volumes
+# Remove everything including volumes
 docker-compose down -v
 ```
 
+---
+
+**Next:** [Kubernetes →]({{ site.baseurl }}/kubernetes/)

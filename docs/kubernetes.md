@@ -1,57 +1,59 @@
 ---
 layout: page
-title: Kubernetes Deployment
+title: Kubernetes
 permalink: /kubernetes/
 ---
 
 # Kubernetes Deployment
 
-Deploy Echo Server on Kubernetes for production-ready orchestration.
-
 ## Quick Deployment
 
-### All-in-One Deployment
+Deploy everything with one command:
+
 ```bash
-# Deploy everything
-kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echo-server-all.yaml
+# Deploy
+kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echoserver-all.yaml
 
 # Port forward for testing
 kubectl port-forward -n echoserver service/echoserver 80:80
 
-# Test the service
+# Test
 curl http://localhost:80
 ```
 
 ## Manual Deployment
 
-### Create Namespace
+### 1. Create Namespace
+
 ```bash
-kubectl apply -f k8s/namespace.yaml
+kubectl create namespace echoserver
 ```
 
-### Create ConfigMap
-```bash
-kubectl apply -f k8s/configmap.yaml
+### 2. Create ConfigMap
+
+`configmap.yaml`:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: echoserver-config
+  namespace: echoserver
+data:
+  LOGS__LEVEL: "info"
+  LOGS__FORMAT: "object"
+  ENABLE_FILE: "false"
+  ENABLE_ENV: "false"
 ```
 
-### Create Deployment
 ```bash
-kubectl apply -f k8s/deployment.yaml
+kubectl apply -f configmap.yaml
 ```
 
-### Create Service
-```bash
-kubectl apply -f k8s/service.yaml
-```
+### 3. Create Deployment
 
-### Create Ingress (Optional)
-```bash
-kubectl apply -f k8s/ingress.yaml
-```
+`deployment.yaml`:
 
-## Configuration Examples
-
-### Basic Deployment
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -73,31 +75,26 @@ spec:
         image: echoserver:latest
         ports:
         - containerPort: 80
-        env:
-        - name: LOGS__LEVEL
-          value: "info"
-        - name: ENABLE_FILE
-          value: "false"
-        - name: ENABLE_ENV
-          value: "false"
+        envFrom:
+        - configMapRef:
+            name: echoserver-config
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
 ```
 
-### ConfigMap for Environment Variables
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: echoserver-config
-  namespace: echoserver
-data:
-  LOGS__LEVEL: "info"
-  LOGS__FORMAT: "object"
-  ENABLE_FILE: "false"
-  ENABLE_ENV: "false"
-  ENABLE_LOGS: "true"
+```bash
+kubectl apply -f deployment.yaml
 ```
 
-### Service Configuration
+### 4. Create Service
+
+`service.yaml`:
+
 ```yaml
 apiVersion: v1
 kind: Service
@@ -113,25 +110,55 @@ spec:
   type: ClusterIP
 ```
 
-## Monitoring
-
-### Check Deployment Status
 ```bash
-kubectl get deployments -n echoserver
-kubectl get pods -n echoserver
-kubectl get services -n echoserver
+kubectl apply -f service.yaml
 ```
 
-### View Logs
+### 5. Create Ingress (Optional)
+
+`ingress.yaml`:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: echoserver
+  namespace: echoserver
+spec:
+  rules:
+  - host: echo.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: echoserver
+            port:
+              number: 80
+```
+
 ```bash
-# All pods
-kubectl logs -n echoserver -l app=echoserver
+kubectl apply -f ingress.yaml
+```
 
-# Specific pod
-kubectl logs -n echoserver <pod-name>
+## Monitoring
 
-# Follow logs
+```bash
+# Check deployment status
+kubectl get deployments -n echoserver
+
+# Check pods
+kubectl get pods -n echoserver
+
+# Check service
+kubectl get services -n echoserver
+
+# View logs
 kubectl logs -n echoserver -l app=echoserver -f
+
+# Describe pod
+kubectl describe pod -n echoserver <pod-name>
 ```
 
 ## Scaling
@@ -142,15 +169,18 @@ kubectl scale deployment/echoserver -n echoserver --replicas=10
 
 # Scale down
 kubectl scale deployment/echoserver -n echoserver --replicas=3
+
+# Autoscale
+kubectl autoscale deployment echoserver -n echoserver --min=3 --max=10 --cpu-percent=80
 ```
 
-## Updating Configuration
+## Update Configuration
 
 ```bash
-# Update ConfigMap
+# Edit ConfigMap
 kubectl edit configmap echoserver-config -n echoserver
 
-# Restart deployment to pick up changes
+# Restart deployment to apply changes
 kubectl rollout restart deployment/echoserver -n echoserver
 
 # Check rollout status
@@ -161,12 +191,14 @@ kubectl rollout status deployment/echoserver -n echoserver
 
 ```bash
 # Delete specific resources
-kubectl delete -f k8s/deployment.yaml
-kubectl delete -f k8s/service.yaml
-kubectl delete -f k8s/configmap.yaml
-kubectl delete -f k8s/namespace.yaml
+kubectl delete deployment echoserver -n echoserver
+kubectl delete service echoserver -n echoserver
+kubectl delete configmap echoserver-config -n echoserver
 
-# Or delete everything at once
+# Or delete entire namespace
 kubectl delete namespace echoserver
 ```
 
+---
+
+**Next:** [Configuration →]({{ site.baseurl }}/configuration/)

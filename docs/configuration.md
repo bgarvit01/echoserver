@@ -6,44 +6,89 @@ permalink: /configuration/
 
 # Configuration
 
-Echo Server provides extensive configuration options to customize behavior, logging, and features.
+Echo Server provides extensive configuration options through environment variables and command-line arguments.
 
-## Configuration Methods
+## Table of Contents
+- [Server Configuration](#server-configuration)
+- [Logging Configuration](#logging-configuration)
+- [Feature Toggles](#feature-toggles)
+- [Control Limits](#control-limits)
+- [Command Line Interface](#command-line-interface)
 
-Echo Server can be configured through:
+---
 
-1. **Environment Variables** - Primary configuration method
-2. **Command Line Arguments** - Override environment variables
-3. **Configuration Files** - For Kubernetes ConfigMaps and Docker Compose
+## Server Configuration
 
-## Quick Reference
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `HOST` | `127.0.0.1` | Server bind address |
+| `PORT` | `80` | Server port |
 
-### Server Configuration
-- `HOST` - Server bind address (default: `127.0.0.1`)
-- `PORT` - Server port (default: `80`)
+### Example
 
-### Logging Configuration
-- `LOGS__LEVEL` - Log level: `debug`, `info`, `warning`, `error` (default: `debug`)
-- `LOGS__FORMAT` - Log format: `default`, `line`, `object` (default: `default`)
-- `LOGS__APP` - Application name in logs (default: `echoserver`)
+```bash
+export HOST=0.0.0.0
+export PORT=8080
+python run_server.py
+```
 
-### Feature Toggles
-- `ENABLE_LOGS` - Enable logging (default: `true`)
-- `ENABLE_HOST` - Include host information (default: `true`)
-- `ENABLE_HTTP` - Include HTTP information (default: `true`)
-- `ENABLE_REQUEST` - Include request details (default: `true`)
-- `ENABLE_COOKIES` - Include cookies (default: `true`)
-- `ENABLE_FILE` - Enable file operations (default: `true`)
-- `ENABLE_HEADER` - Enable custom headers (default: `true`)
-- `ENABLE_ENV` - Include environment variables (default: `false`)
+---
 
-### Control Limits
-- `CONTROLS__TIMES__MIN` - Minimum delay in ms (default: `0`)
-- `CONTROLS__TIMES__MAX` - Maximum delay in ms (default: `60000`)
+## Logging Configuration
 
-## Configuration Examples
+| Variable | Default | Options | Description |
+|----------|---------|---------|-------------|
+| `LOGS__LEVEL` | `debug` | `debug`, `info`, `warning`, `error` | Log level |
+| `LOGS__FORMAT` | `default` | `default`, `line`, `object` | Log format |
+| `LOGS__APP` | `echoserver` | any string | Application name in logs |
+
+### Example
+
+```bash
+export LOGS__LEVEL=info
+export LOGS__FORMAT=object
+export LOGS__APP=myapp
+```
+
+---
+
+## Feature Toggles
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ENABLE_LOGS` | `true` | Enable logging |
+| `ENABLE_HOST` | `true` | Include host information in response |
+| `ENABLE_HTTP` | `true` | Include HTTP information in response |
+| `ENABLE_REQUEST` | `true` | Include request details in response |
+| `ENABLE_COOKIES` | `true` | Include cookies in response |
+| `ENABLE_FILE` | `true` | Enable file operations |
+| `ENABLE_HEADER` | `true` | Enable custom response headers |
+| `ENABLE_ENV` | `false` | Include environment variables in response |
+
+[Learn more about Feature Toggles →]({{ site.baseurl }}/feature-toggle/)
+
+---
+
+## Control Limits
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CONTROLS__TIMES__MIN` | `0` | Minimum delay in milliseconds |
+| `CONTROLS__TIMES__MAX` | `60000` | Maximum delay in milliseconds |
+
+### Example
+
+```bash
+export CONTROLS__TIMES__MIN=0
+export CONTROLS__TIMES__MAX=5000
+```
+
+---
+
+## Configuration Profiles
 
 ### Development
+
 ```bash
 export LOGS__LEVEL=debug
 export LOGS__FORMAT=default
@@ -52,6 +97,7 @@ export ENABLE_ENV=true
 ```
 
 ### Production
+
 ```bash
 export LOGS__LEVEL=info
 export LOGS__FORMAT=object
@@ -61,6 +107,7 @@ export CONTROLS__TIMES__MAX=10000
 ```
 
 ### Security-focused
+
 ```bash
 export ENABLE_FILE=false
 export ENABLE_ENV=false
@@ -68,20 +115,25 @@ export ENABLE_COOKIES=false
 export CONTROLS__TIMES__MAX=5000
 ```
 
+---
+
 ## Command Line Interface
 
 View all available options:
+
 ```bash
 python run_server.py --help
 ```
 
 Override environment variables:
+
 ```bash
 python run_server.py --host 0.0.0.0 --port 8080 --log-level info
 ```
 
-## Additional Resources
+---
 
-- [Feature Toggles]({{ site.baseurl }}/feature-toggle/) - Control functionality
-- [Commands Reference]({{ site.baseurl }}/commands/) - Customize command names
+## Related
 
+- [Feature Toggles]({{ site.baseurl }}/feature-toggle/) - Detailed feature control
+- [Commands]({{ site.baseurl }}/commands/) - Customize command parameters

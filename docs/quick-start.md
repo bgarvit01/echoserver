@@ -6,59 +6,114 @@ permalink: /quick-start/
 
 # Quick Start
 
-Get Echo Server running in minutes with your preferred deployment method.
+Get Echo Server running in minutes.
+
+## Table of Contents
+- [Docker](#docker)
+- [Docker Compose](#docker-compose)
+- [Kubernetes](#kubernetes)
+
+---
 
 ## Docker
 
+Run Echo Server using Docker:
+
 ```bash
-# Run with Docker
+# Pull and run
 docker run -p 80:80 echoserver:latest
 
-# Test the server
-curl http://localhost:80
+# Or build from source
+git clone https://github.com/bgarvit01/echoserver.git
+cd echoserver
+docker build -t echoserver:latest .
+docker run -p 80:80 echoserver:latest
 ```
+
+### With Configuration
+
+```bash
+docker run -p 80:80 \
+  -e LOGS__LEVEL=info \
+  -e ENABLE_FILE=false \
+  -e ENABLE_ENV=false \
+  echoserver:latest
+```
+
+[Full Docker Documentation →]({{ site.baseurl }}/docker/)
+
+---
+
+## Docker Compose
+
+Create a `docker-compose.yml`:
+
+```yaml
+version: "3.8"
+services:
+  echoserver:
+    image: echoserver:latest
+    ports:
+      - "80:80"
+    environment:
+      - LOGS__LEVEL=info
+      - ENABLE_FILE=false
+```
+
+Start the service:
+
+```bash
+docker-compose up -d
+```
+
+[Full Docker Compose Documentation →]({{ site.baseurl }}/docker-compose/)
+
+---
 
 ## Kubernetes
 
+Quick deployment:
+
 ```bash
-# Quick deployment
+# Deploy
 kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s/echoserver-all.yaml
 
 # Port forward for testing
 kubectl port-forward -n echoserver service/echoserver 80:80
-```
 
-## Example Usage
-
-### Basic Echo
-```bash
+# Test
 curl http://localhost:80
 ```
 
-### Custom Status Code
+[Full Kubernetes Documentation →]({{ site.baseurl }}/kubernetes/)
+
+---
+
+## Testing Your Server
+
+Once running, test with these commands:
+
 ```bash
+# Basic echo
+curl http://localhost:80
+
+# Custom status code
 curl -I http://localhost:80/?echo_code=404
-```
 
-### Custom Body
-```bash
+# Custom body
 curl http://localhost:80/?echo_body=hello
-```
 
-### Custom Headers
-```bash
+# Custom headers
 curl -I http://localhost:80/?echo_header=Custom:Value
-```
 
-### Multiple Status Codes (Random)
-```bash
+# Response delay (in milliseconds)
+curl http://localhost:80/?echo_time=2000
+
+# Multiple status codes (random)
 curl -I http://localhost:80/?echo_code=200-400-500
 ```
 
-### Response Delay
-```bash
-curl http://localhost:80/?echo_time=2000
-```
+---
 
 ## Response Format
 
@@ -67,14 +122,7 @@ curl http://localhost:80/?echo_time=2000
   "host": {
     "hostname": "echoserver-7d4c8c4f8b-xyz",
     "ip": "10.244.0.123",
-    "ips": ["10.244.0.123"],
-    "os": {
-      "hostname": "echoserver-7d4c8c4f8b-xyz",
-      "type": "Linux",
-      "platform": "linux",
-      "architecture": "x64",
-      "release": "5.4.0"
-    }
+    "ips": ["10.244.0.123"]
   },
   "http": {
     "method": "GET",
@@ -89,33 +137,15 @@ curl http://localhost:80/?echo_time=2000
       "host": "localhost:80",
       "user-agent": "curl/7.68.0"
     },
-    "body": {},
-    "files": {}
-  },
-  "environment": {...}
+    "body": {}
+  }
 }
 ```
 
-## Deployment Options
+---
 
-- [Docker Deployment]({{ site.baseurl }}/docker/)
-- [Docker Compose Setup]({{ site.baseurl }}/docker-compose/)
-- [Kubernetes Deployment]({{ site.baseurl }}/kubernetes/)
+## Next Steps
 
-## Documentation
-
-- [Configuration]({{ site.baseurl }}/configuration/)
-- [Feature Toggles]({{ site.baseurl }}/feature-toggle/)
-- [Commands Reference]({{ site.baseurl }}/commands/)
-
-## About the Project
-
-Echo Server is a comprehensive HTTP testing tool built in Python, providing enterprise-grade deployment options including Docker and Kubernetes support.
-
-### Contributing
-
-When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
-
-### License
-
-Echo Server is distributed under the MIT License. See `LICENSE` for more information.
+- [Configuration]({{ site.baseurl }}/configuration/) - Customize server behavior
+- [Feature Toggles]({{ site.baseurl }}/feature-toggle/) - Enable/disable features
+- [Commands]({{ site.baseurl }}/commands/) - Customize command parameters
