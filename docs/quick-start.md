@@ -28,18 +28,6 @@ kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/main/k8s
 kubectl port-forward -n echoserver service/echoserver 80:80
 ```
 
-## Prerequisites
-
-Before you begin, ensure you have the required tools installed for your chosen deployment method:
-
-### For Docker
-- Docker Engine 20.10+
-- Docker Compose 2.0+ (for Compose deployments)
-
-### For Kubernetes
-- Kubernetes cluster 1.19+
-- kubectl configured for your cluster
-
 ## Example Usage
 
 ### Basic Echo
