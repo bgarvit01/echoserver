@@ -1,10 +1,12 @@
 ---
 layout: page
 title: Docker
+nav_order: 3
 permalink: /docker/
+parent: Quick-Start
 ---
 
-# Docker Deployment
+# Docker
 
 ## Basic Usage
 
@@ -121,4 +123,4 @@ chmod 755 /path/to/mounted/directory
 
 ---
 
-**Next:** [Docker Compose →]({{ site.baseurl }}/docker-compose/)
+**Next:** [Docker-Compose →]({{ site.baseurl }}/docker-compose/)

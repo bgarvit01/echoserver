@@ -1,10 +1,12 @@
 ---
 layout: page
 title: Kubernetes
+nav_order: 5
 permalink: /kubernetes/
+parent: Quick-Start
 ---
 
-# Kubernetes Deployment
+# Kubernetes
 
 ## Quick Deployment
 

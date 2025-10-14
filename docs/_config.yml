@@ -7,9 +7,19 @@ theme: minima
 markdown: kramdown
 permalink: pretty
 
+# Header pages navigation order
+header_pages:
+  - index.md
+  - quick-start.md
+  - docker.md
+  - docker-compose.md
+  - kubernetes.md
+  - configuration.md
+  - feature-toggle.md
+  - commands.md
+
 # Exclude from processing
 exclude:
   - Gemfile
   - Gemfile.lock
   - README.md
-

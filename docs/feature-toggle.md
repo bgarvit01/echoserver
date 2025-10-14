@@ -1,17 +1,14 @@
 ---
 layout: page
-title: Feature Toggles
+title: Feature-Toggle
+nav_order: 7
 permalink: /feature-toggle/
+parent: Configuration
 ---
 
-# Feature Toggles
+# Feature-Toggle
 
 Control what information is included in responses and what functionality is available.
-
-## Table of Contents
-- [Response Content Features](#response-content-features)
-- [Functional Features](#functional-features)
-- [Security Profiles](#security-profiles)
 
 ---
 

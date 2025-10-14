@@ -1,17 +1,13 @@
 ---
 layout: page
-title: Quick Start
+title: Quick-Start
+nav_order: 2
 permalink: /quick-start/
 ---
 
-# Quick Start
+# Quick-Start
 
 Get Echo Server running in minutes.
-
-## Table of Contents
-- [Docker](#docker)
-- [Docker Compose](#docker-compose)
-- [Kubernetes](#kubernetes)
 
 ---
 
@@ -44,7 +40,7 @@ docker run -p 80:80 \
 
 ---
 
-## Docker Compose
+## Docker-Compose
 
 Create a `docker-compose.yml`:
 
@@ -147,5 +143,5 @@ curl -I http://localhost:80/?echo_code=200-400-500
 ## Next Steps
 
 - [Configuration]({{ site.baseurl }}/configuration/) - Customize server behavior
-- [Feature Toggles]({{ site.baseurl }}/feature-toggle/) - Enable/disable features
+- [Feature-Toggle]({{ site.baseurl }}/feature-toggle/) - Enable/disable features
 - [Commands]({{ site.baseurl }}/commands/) - Customize command parameters

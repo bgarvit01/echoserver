@@ -1,10 +1,12 @@
 ---
 layout: page
-title: Docker Compose
+title: Docker-Compose
+nav_order: 4
 permalink: /docker-compose/
+parent: Quick-Start
 ---
 
-# Docker Compose
+# Docker-Compose
 
 ## Basic Setup
 

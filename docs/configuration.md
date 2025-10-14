@@ -1,19 +1,13 @@
 ---
 layout: page
 title: Configuration
+nav_order: 6
 permalink: /configuration/
 ---
 
 # Configuration
 
 Echo Server provides extensive configuration options through environment variables and command-line arguments.
-
-## Table of Contents
-- [Server Configuration](#server-configuration)
-- [Logging Configuration](#logging-configuration)
-- [Feature Toggles](#feature-toggles)
-- [Control Limits](#control-limits)
-- [Command Line Interface](#command-line-interface)
 
 ---
 
@@ -65,7 +59,7 @@ export LOGS__APP=myapp
 | `ENABLE_HEADER` | `true` | Enable custom response headers |
 | `ENABLE_ENV` | `false` | Include environment variables in response |
 
-[Learn more about Feature Toggles →]({{ site.baseurl }}/feature-toggle/)
+[Learn more about Feature-Toggle →]({{ site.baseurl }}/feature-toggle/)
 
 ---
 
@@ -135,5 +129,5 @@ python run_server.py --host 0.0.0.0 --port 8080 --log-level info
 
 ## Related
 
-- [Feature Toggles]({{ site.baseurl }}/feature-toggle/) - Detailed feature control
+- [Feature-Toggle]({{ site.baseurl }}/feature-toggle/) - Detailed feature control
 - [Commands]({{ site.baseurl }}/commands/) - Customize command parameters

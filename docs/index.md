@@ -1,6 +1,7 @@
 ---
 layout: home
-title: Home
+title: Documentation
+nav_order: 1
 ---
 
 # Echo Server

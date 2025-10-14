@@ -1,17 +1,14 @@
 ---
 layout: page
 title: Commands
+nav_order: 8
 permalink: /commands/
+parent: Configuration
 ---
 
 # Commands
 
 Customize command names and parameters for maximum flexibility.
-
-## Table of Contents
-- [Default Commands](#default-commands)
-- [Customization](#customization)
-- [Examples](#examples)
 
 ---
 
@@ -144,7 +141,7 @@ docker run -p 80:80 \
   echoserver:latest
 ```
 
-### Docker Compose
+### Docker-Compose
 
 ```yaml
 services:
