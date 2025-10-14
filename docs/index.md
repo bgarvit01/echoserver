@@ -123,7 +123,6 @@ curl http://localhost:80/?echo_time=2000
 - [Configuration]({{ site.baseurl }}/configuration/)
 - [Feature Toggles]({{ site.baseurl }}/feature-toggle/)
 - [Commands Reference]({{ site.baseurl }}/commands/)
-- [Release Notes]({{ site.baseurl }}/release-notes/)
 
 ## About the Project
 
