@@ -11,8 +11,10 @@ This module provides a refactored, maintainable HTTP echo server with:
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Any
 import json
+import asyncio
+import threading
 
 from .config import get_config, ServerConfig, set_config
 from .response_handlers import ResponseManager, StatusCodeManager, HeaderManager
@@ -225,6 +227,8 @@ class EchoRequestHandler(BaseHTTPRequestHandler):
 class EchoServer:
     """
     Main Echo Server class with lifecycle management.
+    
+    Supports both HTTP/1.1 (via HTTPServer) and HTTP/2 (via hypercorn).
     """
     
     def __init__(self, config: Optional[ServerConfig] = None):
@@ -237,31 +241,30 @@ class EchoServer:
         if config:
             set_config(config)
         self.config = get_config()
-        self.server: Optional[HTTPServer] = None
+        self.server: Optional[Any] = None  # Can be HTTPServer or hypercorn server
         self.logger = RequestLogger(self.config)
+        self._server_thread: Optional[threading.Thread] = None
     
     def start(self) -> None:
         """
         Start the echo server.
+        
+        Uses HTTP/2 (hypercorn) if enable_http2 is True, otherwise uses HTTP/1.1 (HTTPServer).
         
         Raises:
             OSError: If unable to bind to the specified host/port
             Exception: For other server startup errors
         """
         try:
+            protocol = "HTTP/2" if self.config.enable_http2 else "HTTP/1.1"
             self.logger.log_info(
-                f"Starting Echo Server on http://{self.config.host}:{self.config.port}"
+                f"Starting Echo Server on http://{self.config.host}:{self.config.port} ({protocol})"
             )
             
-            # Create server
-            self.server = HTTPServer(
-                (self.config.host, self.config.port), 
-                EchoRequestHandler
-            )
-            
-            # Start serving
-            self.logger.log_info("Echo Server is ready to accept connections")
-            self.server.serve_forever()
+            if self.config.enable_http2:
+                self._start_http2()
+            else:
+                self._start_http11()
             
         except OSError as e:
             error_msg = f"Failed to start server on {self.config.host}:{self.config.port}"
@@ -274,12 +277,52 @@ class EchoServer:
             self.logger.log_error("Unexpected error starting server", e)
             raise
     
+    def _start_http11(self) -> None:
+        """Start HTTP/1.1 server using HTTPServer."""
+        self.server = HTTPServer(
+            (self.config.host, self.config.port), 
+            EchoRequestHandler
+        )
+        
+        self.logger.log_info("Echo Server is ready to accept connections (HTTP/1.1)")
+        self.server.serve_forever()
+    
+    def _start_http2(self) -> None:
+        """Start HTTP/2 server using hypercorn."""
+        try:
+            import hypercorn.asyncio
+            from hypercorn.config import Config
+            from .asgi_app import ASGIEchoApp
+        except ImportError:
+            raise ImportError(
+                "HTTP/2 support requires hypercorn. Install it with: pip install hypercorn"
+            )
+        
+        # Create ASGI application
+        app = ASGIEchoApp()
+        
+        # Configure hypercorn
+        config = Config()
+        config.bind = [f"{self.config.host}:{self.config.port}"]
+        config.use_reloader = False
+        
+        self.logger.log_info("Echo Server is ready to accept connections (HTTP/2)")
+        
+        # Run hypercorn
+        asyncio.run(hypercorn.asyncio.serve(app, config))
+    
     def stop(self) -> None:
         """Stop the echo server gracefully."""
         if self.server:
             self.logger.log_info("Stopping Echo Server...")
-            self.server.shutdown()
-            self.server.server_close()
+            if self.config.enable_http2:
+                # Hypercorn handles shutdown via asyncio
+                # The server will stop when the event loop is closed
+                pass
+            else:
+                # HTTP/1.1 server shutdown
+                self.server.shutdown()
+                self.server.server_close()
             self.logger.log_info("Echo Server stopped")
     
     def get_server_info(self) -> Dict[str, any]:
@@ -292,6 +335,7 @@ class EchoServer:
         return {
             "host": self.config.host,
             "port": self.config.port,
+            "protocol": "HTTP/2" if self.config.enable_http2 else "HTTP/1.1",
             "app_name": self.config.logging.app_name,
             "features": {
                 "logs": self.config.features.enable_logs,

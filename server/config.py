@@ -96,6 +96,7 @@ class ServerConfig:
     """Main server configuration."""
     host: str = "127.0.0.1"
     port: int = 80
+    enable_http2: bool = False
     commands: CommandConfig = field(default_factory=CommandConfig)
     timing: TimingControls = field(default_factory=TimingControls)
     features: FeatureFlags = field(default_factory=FeatureFlags)
@@ -140,6 +141,7 @@ class ConfigurationManager:
         # Server configuration
         host = os.getenv('HOST', '127.0.0.1')
         port = get_env_int('PORT', 80)
+        enable_http2 = get_env_bool('ENABLE_HTTP2', False)
         
         # Command configuration
         commands = CommandConfig(
@@ -185,6 +187,7 @@ class ConfigurationManager:
         return ServerConfig(
             host=host,
             port=port,
+            enable_http2=enable_http2,
             commands=commands,
             timing=timing,
             features=features,

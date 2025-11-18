@@ -47,6 +47,10 @@ Examples:
         '--port', type=int, default=80,
         help='Port to listen on (default: 80)'
     )
+    server_group.add_argument(
+        '--enable-http2', action='store_true',
+        help='Enable HTTP/2 support (requires hypercorn)'
+    )
     
     # Timing controls
     timing_group = parser.add_argument_group('Timing Controls')
@@ -156,6 +160,7 @@ def create_config_from_args(args) -> ServerConfig:
     # Override with command line arguments
     config.host = args.host
     config.port = args.port
+    config.enable_http2 = args.enable_http2
     
     # Timing configuration
     config.timing = TimingControls(
@@ -195,6 +200,8 @@ def print_configuration(config: ServerConfig) -> None:
     print(f"Server:")
     print(f"  Host: {config.host}")
     print(f"  Port: {config.port}")
+    protocol = "HTTP/2" if config.enable_http2 else "HTTP/1.1"
+    print(f"  Protocol: {protocol}")
     print(f"  URL: http://{config.host}:{config.port}")
     
     print(f"\nLogging:")
