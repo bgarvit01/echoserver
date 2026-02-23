@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: echoserver-ingress
+  namespace: echoserver
+  labels:
+    app: echoserver
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+spec:
+  rules:
+  - host: echo.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: echoserver
+            port:
+              number: 80
+  # Uncomment for TLS support
+  # tls:
+  # - hosts:
+  #   - echo.local
+  #   secretName: echoserver-tls

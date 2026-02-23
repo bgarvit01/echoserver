@@ -1,0 +1,71 @@
+name: Auto Tag Latest
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  auto-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: get-latest-tag
+        run: |
+          latest_tag=$(git tag -l "v*.*.*" | sort -V | tail -n1)
+          if [ -z "$latest_tag" ]; then
+            latest_tag="v0.0.0"
+          fi
+          echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
+          
+          # Extract version numbers
+          version=${latest_tag#v}
+          IFS='.' read -r major minor patch <<< "$version"
+          
+          # Increment patch version
+          new_patch=$((patch + 1))
+          new_version="v$major.$minor.$new_patch"
+          
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Check if there are new commits
+        id: check-commits
+        run: |
+          # Check if there are commits since the last tag
+          if git rev-list ${{ steps.get-latest-tag.outputs.latest_tag }}..HEAD --count | grep -q "^0$"; then
+            echo "has_new_commits=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_new_commits=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create new tag
+        if: steps.check-commits.outputs.has_new_commits == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create and push new tag
+          git tag -a ${{ steps.get-latest-tag.outputs.new_version }} -m "Auto-generated release ${{ steps.get-latest-tag.outputs.new_version }}"
+          git push origin ${{ steps.get-latest-tag.outputs.new_version }}
+          
+          echo "Created and pushed tag: ${{ steps.get-latest-tag.outputs.new_version }}"
+
+      - name: Update latest tag
+        if: steps.check-commits.outputs.has_new_commits == 'true'
+        run: |
+          # Delete existing latest tag if it exists
+          git tag -d latest || true
+          git push origin :refs/tags/latest || true
+          
+          # Create new latest tag
+          git tag -a latest -m "Latest release"
+          git push origin latest
+          
+          echo "Updated latest tag"

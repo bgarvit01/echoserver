@@ -1,0 +1,92 @@
+# Production Helm values for Echo Server
+# Use with: helm install echoserver ./helm/echoserver -f examples/production-values.yaml
+
+replicaCount: 5
+
+image:
+  repository: echoserver
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+# Enable ingress for external access
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: echo.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: echoserver-tls
+      hosts:
+        - echo.yourdomain.com
+
+# Production resource limits
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Enable autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+# Production-safe configuration
+echoServer:
+  logs:
+    level: "info"
+    format: "object"  # JSON format for log aggregation
+  features:
+    enableLogs: true
+    enableHost: true
+    enableHttp: true
+    enableRequest: true
+    enableCookies: true
+    enableFile: false      # Disable for security
+    enableHeader: true
+    enableEnv: false       # Disable for security
+  controls:
+    timesMin: 0
+    timesMax: 10000       # Reduced max delay
+
+# Security context
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+    - ALL
+
+# Node affinity for production workloads
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - echoserver
+        topologyKey: kubernetes.io/hostname

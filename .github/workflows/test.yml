@@ -1,0 +1,38 @@
+name: Test Echo Server
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Allow this workflow to be called by other workflows
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run tests
+      run: |
+        python -m pytest tests/ -v
+    
+    - name: Test Docker build
+      run: |
+        docker build -t test-echoserver .
+        docker run -d -p 8080:80 --name test-container test-echoserver
+        sleep 5
+        curl -f http://localhost:8080 || exit 1
+        docker stop test-container

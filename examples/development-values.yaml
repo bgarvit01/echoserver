@@ -1,0 +1,50 @@
+# Development Helm values for Echo Server
+# Use with: helm install echoserver ./helm/echoserver -f examples/development-values.yaml
+
+replicaCount: 1
+
+image:
+  repository: echoserver
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+# No ingress for development
+ingress:
+  enabled: false
+
+# Minimal resources for development
+resources:
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+# No autoscaling in development
+autoscaling:
+  enabled: false
+
+# Development-friendly configuration
+echoServer:
+  logs:
+    level: "debug"
+    format: "default"     # Human-readable format
+  features:
+    enableLogs: true
+    enableHost: true
+    enableHttp: true
+    enableRequest: true
+    enableCookies: true
+    enableFile: true      # Enable for testing
+    enableHeader: true
+    enableEnv: true       # Enable for debugging
+  controls:
+    timesMin: 0
+    timesMax: 60000       # Full range for testing
+
+# Service configuration for easy access
+service:
+  type: NodePort
+  port: 80
+  targetPort: 80

@@ -1,0 +1,39 @@
+__pycache__/
+*.pyc
+*$py.class
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local development
+.env
+.env.local
+docker-compose.override.yml
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Virtual environments
+venv/
+.venv/
+ENV/
+env/
+
+# Helper guide
+SETUP_GUIDE.md
+setup-checklist.sh

@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  echoserver:
+    image: echoserver:latest
+    ports:
+      - "80:80"
+    environment:
+      - LOGS__LEVEL=info
+      - LOGS__FORMAT=line
+      - ENABLE_LOGS=true
+      - ENABLE_HOST=true
+      - ENABLE_HTTP=true
+      - ENABLE_REQUEST=true
+      - ENABLE_FILE=false
+      - ENABLE_ENV=false
+      - CONTROLS__TIMES__MAX=30000
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:80', timeout=2)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: always
+    deploy:
+      replicas: 5
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure

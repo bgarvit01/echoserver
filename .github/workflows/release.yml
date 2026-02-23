@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+
+  docker:
+    uses: ./.github/workflows/docker-build.yml
+    secrets: inherit
+    needs: test
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: [test, docker]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## What's Changed
+            
+            - Docker image: `garvitbhateja/echoserver:${{ github.ref_name }}`
+            - Documentation: https://bgarvit01.github.io/echoserver/
+            
+            ## Installation
+            
+            ### Docker
+            ```bash
+            docker run -p 80:80 garvitbhateja/echoserver:${{ github.ref_name }}
+            ```
+            
+            ### Kubernetes
+            ```bash
+            # Apply all-in-one manifest
+            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/echoserver-all.yaml
+            
+            # Or apply individual manifests
+            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/namespace.yaml
+            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/configmap.yaml
+            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/deployment.yaml
+            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/service.yaml
+            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/ingress.yaml
+            
+            # Access the service
+            kubectl port-forward -n echoserver service/echoserver 8080:80
+            # Then visit: http://localhost:8080
+            ```
+          draft: false
+          prerelease: false

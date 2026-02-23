@@ -1,0 +1,59 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.pytest_cache
+htmlcov
+
+# Virtual environments
+venv
+.venv
+ENV
+env
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+docs/
+
+# Examples and demos
+examples/
+demo_*
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Kubernetes
+k8s/
+*.yaml
+*.yml
+
+# Helm
+charts/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
