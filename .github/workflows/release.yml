@@ -1,63 +1,282 @@
-name: Release
+name: CI / Release
+
+# Single end-to-end pipeline that supersedes auto-tag.yml,
+# docker-build.yml, publish-release.yml and the old release.yml.
+#
+# Triggers:
+#   - push to main   -> run tests, build & push Docker image, auto-bump
+#                       v*.*.* tag, move 'latest', publish GitHub Release.
+#   - PR to main     -> run tests, build (but do NOT push) Docker image
+#                       for early validation.
+#   - workflow_dispatch with `tag` input -> release that exact version
+#                       (useful for forcing a major/minor bump or for
+#                       backfilling, e.g. tag = v1.0.1).
+#
+# All four release-side effects (tag push, latest update, Docker push,
+# GitHub Release creation) happen inside a single workflow run, so the
+# GitHub limitation that "events authored by GITHUB_TOKEN do not trigger
+# further workflows" doesn't apply - no PAT required.
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: >-
+          Explicit version to release (e.g. v1.0.2). Leave empty to
+          auto-bump the patch version of the most recent v*.*.* tag.
+        required: false
+        type: string
+        default: ''
+      force:
+        description: >-
+          Release even when there are no new commits since the last tag.
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: garvitbhateja/echoserver
 
 jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Tests (always run - PRs and main pushes)
+  # ---------------------------------------------------------------------------
   test:
-    uses: ./.github/workflows/test.yml
-
-  docker:
-    uses: ./.github/workflows/docker-build.yml
-    secrets: inherit
-    needs: test
-
-  create-release:
     runs-on: ubuntu-latest
-    needs: [test, docker]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest
+        run: python -m pytest tests/ -v
+
+  # ---------------------------------------------------------------------------
+  # 2. Decide release version (skipped on PRs)
+  # ---------------------------------------------------------------------------
+  version:
+    if: github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    outputs:
+      should_release:     ${{ steps.decide.outputs.should_release }}
+      version:            ${{ steps.decide.outputs.version }}
+      prev_version:       ${{ steps.decide.outputs.prev_version }}
+      tag_already_exists: ${{ steps.decide.outputs.tag_already_exists }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Decide version
+        id: decide
+        env:
+          INPUT_TAG:   ${{ inputs.tag }}
+          INPUT_FORCE: ${{ inputs.force }}
+        run: |
+          set -euo pipefail
+
+          prev=$(git tag -l 'v*.*.*' --sort=-v:refname | head -n1)
+          [ -z "$prev" ] && prev="v0.0.0"
+          echo "prev_version=$prev" >> "$GITHUB_OUTPUT"
+          echo "Previous tag: $prev"
+
+          if [ -n "${INPUT_TAG:-}" ]; then
+            new="$INPUT_TAG"
+            if ! echo "$new" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+              echo "::error::Invalid tag '$new' (must match vMAJOR.MINOR.PATCH)"
+              exit 1
+            fi
+            if git rev-parse -q --verify "refs/tags/$new" >/dev/null 2>&1; then
+              echo "Tag $new already exists - backfill mode"
+              echo "tag_already_exists=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "tag_already_exists=false" >> "$GITHUB_OUTPUT"
+            fi
+            should=true
+          else
+            ver=${prev#v}
+            IFS='.' read -r major minor patch <<< "$ver"
+            new="v${major}.${minor}.$((patch + 1))"
+            echo "tag_already_exists=false" >> "$GITHUB_OUTPUT"
+
+            if [ "${INPUT_FORCE:-false}" = "true" ]; then
+              should=true
+            else
+              count=$(git rev-list "${prev}..HEAD" --count 2>/dev/null || echo 0)
+              if [ "$count" -eq 0 ]; then
+                echo "No new commits since $prev - skipping release"
+                should=false
+              else
+                echo "$count new commits since $prev - releasing as $new"
+                should=true
+              fi
+            fi
+          fi
+
+          echo "version=$new" >> "$GITHUB_OUTPUT"
+          echo "should_release=$should" >> "$GITHUB_OUTPUT"
+          echo "Resolved: version=$new should_release=$should"
+
+  # ---------------------------------------------------------------------------
+  # 3. Docker build (PR: build only; release: build + push :vX.Y.Z + :latest)
+  # ---------------------------------------------------------------------------
+  docker:
+    needs: [test, version]
+    if: |
+      always() && needs.test.result == 'success' && (
+        github.event_name == 'pull_request' ||
+        (needs.version.result == 'success' &&
+         needs.version.outputs.should_release == 'true')
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Single-arch build that we can `docker run` for a smoke test.
+      # docker/build-push-action with `load: true` only supports a single
+      # platform, so we build amd64 here and (for releases) re-build
+      # multi-arch with `push: true` below - both share the GHA cache,
+      # so the second build is essentially a tag/push operation.
+      - name: Build (single-arch, for smoke test)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: ${{ env.IMAGE_NAME }}:smoke-test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test image
+        run: |
+          set -euo pipefail
+          docker run -d -p 18080:80 --name echoserver-smoke \
+            "${IMAGE_NAME}:smoke-test"
+
+          # Wait up to ~15s for the server to come up.
+          ok=false
+          for i in $(seq 1 15); do
+            if curl -fsS http://127.0.0.1:18080 >/dev/null 2>&1; then
+              echo "Smoke test passed on attempt $i"
+              ok=true
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$ok" != "true" ]; then
+            echo "::error::Smoke test failed - container did not respond"
+            docker logs echoserver-smoke || true
+            docker rm -f echoserver-smoke || true
+            exit 1
+          fi
+
+          docker stop echoserver-smoke
+          docker rm   echoserver-smoke
+
+      - name: Compute release image tags
+        if: github.event_name != 'pull_request'
+        id: imgtags
+        run: |
+          set -euo pipefail
+          v="${{ needs.version.outputs.version }}"
+          echo "tags=${IMAGE_NAME}:${v},${IMAGE_NAME}:latest" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push (multi-arch, release only)
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.imgtags.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ---------------------------------------------------------------------------
+  # 4. Git tag + GitHub Release (only when releasing)
+  # ---------------------------------------------------------------------------
+  release:
+    needs: [version, docker]
+    if: |
+      needs.version.outputs.should_release == 'true' &&
+      needs.docker.result == 'success' &&
+      github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
         with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          body: |
-            ## What's Changed
-            
-            - Docker image: `garvitbhateja/echoserver:${{ github.ref_name }}`
-            - Documentation: https://bgarvit01.github.io/echoserver/
-            
-            ## Installation
-            
-            ### Docker
-            ```bash
-            docker run -p 80:80 garvitbhateja/echoserver:${{ github.ref_name }}
-            ```
-            
-            ### Kubernetes
-            ```bash
-            # Apply all-in-one manifest
-            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/echoserver-all.yaml
-            
-            # Or apply individual manifests
-            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/namespace.yaml
-            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/configmap.yaml
-            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/deployment.yaml
-            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/service.yaml
-            kubectl apply -f https://raw.githubusercontent.com/bgarvit01/echoserver/${{ github.ref_name }}/k8s/ingress.yaml
-            
-            # Access the service
-            kubectl port-forward -n echoserver service/echoserver 8080:80
-            # Then visit: http://localhost:8080
-            ```
-          draft: false
-          prerelease: false
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create git tag
+        if: needs.version.outputs.tag_already_exists != 'true'
+        run: |
+          set -euo pipefail
+          v="${{ needs.version.outputs.version }}"
+          git tag -a "$v" -m "Release $v"
+          git push origin "$v"
+          echo "Pushed tag: $v"
+
+      - name: Move 'latest' tag
+        run: |
+          set -euo pipefail
+          v="${{ needs.version.outputs.version }}"
+          git tag -fa latest -m "Latest release ($v)"
+          git push origin latest --force
+          echo "Moved 'latest' to: $v"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          v="${{ needs.version.outputs.version }}"
+          prev="${{ needs.version.outputs.prev_version }}"
+
+          if gh release view "$v" >/dev/null 2>&1; then
+            echo "GitHub Release for $v already exists; skipping"
+            exit 0
+          fi
+
+          # --notes-start-tag scopes the auto-generated changelog to
+          # commits between the previous release and this one.
+          gh release create "$v" \
+            --title "Release $v" \
+            --notes-start-tag "$prev" \
+            --generate-notes \
+            --verify-tag
+
+          echo "Published GitHub Release: $v"
