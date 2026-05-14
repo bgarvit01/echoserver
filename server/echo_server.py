@@ -9,12 +9,13 @@ This module provides a refactored, maintainable HTTP echo server with:
 - Performance optimizations with caching
 """
 
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 from typing import Dict, List, Tuple, Optional, Any
 import json
 import asyncio
 import threading
+import time
 
 from .config import get_config, ServerConfig, set_config
 from .response_handlers import ResponseManager, StatusCodeManager, HeaderManager
@@ -100,7 +101,17 @@ class EchoRequestHandler(BaseHTTPRequestHandler):
             
             # Add method to headers for response handlers
             headers_dict['REQUEST_METHOD'] = self.command
-            
+
+            # Silent-drop short-circuit: read the request fully, sleep for the
+            # requested duration, then close the connection without sending a
+            # response. Used to simulate a backend that hangs (ENG-809879).
+            silent_drop_ms = self.timing_manager.get_silent_drop_ms(
+                headers_dict, query_params
+            )
+            if silent_drop_ms is not None:
+                self._silent_drop(silent_drop_ms)
+                return
+
             # Apply timing delay if requested
             self.timing_manager.apply_delay(headers_dict, query_params)
             
@@ -163,6 +174,55 @@ class EchoRequestHandler(BaseHTTPRequestHandler):
         except Exception as e:
             self.request_logger.log_error("Error sending response", e)
     
+    def _silent_drop(self, sleep_ms: int) -> None:
+        """
+        Simulate a silently-dropped request.
+
+        The request line, headers and body have already been read by the
+        time we get here, so the client believes the request was accepted.
+        We then sleep for ``sleep_ms`` milliseconds and close the underlying
+        socket without ever emitting an HTTP response. Clients should see
+        either an idle-timeout (if their timeout is shorter than
+        ``sleep_ms``) or an immediate "connection closed by peer" once the
+        sleep elapses.
+
+        Args:
+            sleep_ms: How long to hold the connection open before closing.
+        """
+        client = f"{self.client_address[0]}:{self.client_address[1]}"
+        self.request_logger.log_info(
+            f"Silently dropping {self.command} {self.path} from {client}; "
+            f"sleeping {sleep_ms}ms before closing connection"
+        )
+
+        # Make sure we don't keep this connection alive after we return -
+        # BaseHTTPRequestHandler's request loop checks this flag.
+        self.close_connection = True
+
+        try:
+            time.sleep(sleep_ms / 1000.0)
+        except Exception as e:
+            self.request_logger.log_error(
+                "Error during silent-drop sleep", e
+            )
+
+        self.request_logger.log_info(
+            f"Closing silently-dropped connection from {client}"
+        )
+
+        # Force the socket closed so the client unblocks immediately on
+        # return rather than waiting for any keep-alive timeout.
+        try:
+            if self.connection is not None:
+                try:
+                    import socket as _socket
+                    self.connection.shutdown(_socket.SHUT_RDWR)
+                except OSError:
+                    pass
+                self.connection.close()
+        except Exception:
+            pass
+
     def _send_error_response(self, status_code: int, message: str) -> None:
         """
         Send error response with proper formatting.
@@ -278,12 +338,23 @@ class EchoServer:
             raise
     
     def _start_http11(self) -> None:
-        """Start HTTP/1.1 server using HTTPServer."""
-        self.server = HTTPServer(
-            (self.config.host, self.config.port), 
+        """
+        Start HTTP/1.1 server using ThreadingHTTPServer.
+
+        ThreadingHTTPServer is used (rather than HTTPServer) so that
+        long-running handlers - notably silent-drop requests that sleep
+        for many seconds without responding - do not block other clients.
+        This matches the threaded-per-connection behavior of the reference
+        Python silent-drop server used to validate ENG-809879.
+        """
+        self.server = ThreadingHTTPServer(
+            (self.config.host, self.config.port),
             EchoRequestHandler
         )
-        
+        # Don't keep the process alive on shutdown waiting for stuck
+        # silent-drop threads.
+        self.server.daemon_threads = True
+
         self.logger.log_info("Echo Server is ready to accept connections (HTTP/1.1)")
         self.server.serve_forever()
     

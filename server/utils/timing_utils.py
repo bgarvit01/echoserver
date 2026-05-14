@@ -3,7 +3,7 @@ Timing utilities for request delays and validation.
 """
 
 import time
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from ..config import ServerConfig
 
@@ -77,6 +77,62 @@ class TimingManager:
         
         return delay_ms
     
+    def get_silent_drop_ms(self, headers: Dict[str, str],
+                           query: Dict[str, List[str]]) -> Optional[int]:
+        """
+        Determine if the caller asked the server to silently drop this request.
+
+        A "silent drop" means: read the request fully, then sleep for the
+        requested number of milliseconds and close the connection without
+        ever sending a response. This is meant to simulate a backend that
+        accepts the TCP connection and the request bytes but never replies,
+        so that clients can be tested for correct idle-timeout / connection
+        cleanup behavior (see ENG-809879).
+
+        Accepted values (from header or query parameter):
+            - "true" / "1" / "yes" / "on" / "" -> use ``timing.max_delay_ms``
+            - any positive integer string       -> sleep that many ms
+              (clamped to the configured min/max delay)
+
+        Returns:
+            Sleep duration in milliseconds, or ``None`` if silent-drop was
+            not requested.
+        """
+        headers_lower = {k.lower(): v for k, v in headers.items()}
+
+        raw_value: Optional[str] = None
+        if self.config.commands.silent_drop_header.lower() in headers_lower:
+            raw_value = headers_lower[
+                self.config.commands.silent_drop_header.lower()
+            ]
+        elif self.config.commands.silent_drop_query in query:
+            values = query[self.config.commands.silent_drop_query]
+            raw_value = values[0] if values else ""
+        else:
+            return None
+
+        normalized = (raw_value or "").strip().lower()
+
+        # Treat enabling-only values (no explicit duration) as "use the
+        # configured max delay" so the simplest invocation just works.
+        if normalized in ("", "true", "1", "yes", "on"):
+            return max(self.config.timing.max_delay_ms,
+                       self.config.timing.min_delay_ms)
+
+        # Any explicitly disabling value short-circuits to "no drop".
+        if normalized in ("false", "0", "no", "off"):
+            return None
+
+        try:
+            ms = int(normalized)
+        except (ValueError, TypeError):
+            return None
+
+        if ms <= 0:
+            return None
+
+        return self._validate_delay(str(ms))
+
     def is_delay_within_limits(self, delay_ms: int) -> bool:
         """
         Check if delay is within configured limits.

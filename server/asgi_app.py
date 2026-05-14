@@ -6,6 +6,7 @@ enabling HTTP/2 support via hypercorn.
 """
 
 from typing import Dict, List, Tuple, Optional, Any
+import asyncio
 import json
 from urllib.parse import urlparse, parse_qs
 
@@ -79,7 +80,19 @@ class ASGIEchoApp:
         
         # Add method to headers for response handlers
         headers_dict['REQUEST_METHOD'] = method
-        
+
+        # Silent-drop short-circuit: read the request fully, sleep for the
+        # requested duration, then close the connection without sending a
+        # response. Used to simulate a backend that hangs (ENG-809879).
+        silent_drop_ms = self.timing_manager.get_silent_drop_ms(
+            headers_dict, query_params
+        )
+        if silent_drop_ms is not None:
+            await self._silent_drop(
+                method, path, client_address, silent_drop_ms, send
+            )
+            return
+
         # Apply timing delay if requested
         self.timing_manager.apply_delay(headers_dict, query_params)
         
@@ -155,6 +168,65 @@ class ASGIEchoApp:
             self.request_logger.log_error("Error decoding request body", e)
             return ""
     
+    async def _silent_drop(self, method: str, path: str,
+                           client_address: tuple, sleep_ms: int, send) -> None:
+        """
+        Simulate a silently-dropped request on the ASGI / HTTP/2 path.
+
+        The request and headers are already consumed by the time we get
+        here, so the client believes the request was accepted. We then
+        sleep for ``sleep_ms`` milliseconds and ask the ASGI server to
+        close the connection by sending an empty body with
+        ``Connection: close`` and a 502 status. ASGI does not expose the
+        raw socket the way the threaded HTTP/1.1 path does, so this is the
+        closest approximation: the client will either time out (idle
+        timeout) before we reply, or see a connection-close once the
+        sleep elapses.
+
+        Args:
+            method: HTTP method (for logging).
+            path: Request path (for logging).
+            client_address: ``(host, port)`` of the remote peer.
+            sleep_ms: How long to hold the connection open before closing.
+            send: ASGI ``send`` callable.
+        """
+        client = f"{client_address[0]}:{client_address[1]}"
+        self.request_logger.log_info(
+            f"Silently dropping {method} {path} from {client}; "
+            f"sleeping {sleep_ms}ms before closing connection"
+        )
+
+        try:
+            await asyncio.sleep(sleep_ms / 1000.0)
+        except asyncio.CancelledError:
+            self.request_logger.log_info(
+                f"Silent-drop sleep cancelled for {client}"
+            )
+            raise
+        except Exception as e:
+            self.request_logger.log_error(
+                "Error during silent-drop sleep", e
+            )
+
+        self.request_logger.log_info(
+            f"Closing silently-dropped connection from {client}"
+        )
+
+        try:
+            await send({
+                "type": "http.response.start",
+                "status": 502,
+                "headers": [(b"connection", b"close")],
+            })
+            await send({
+                "type": "http.response.body",
+                "body": b"",
+                "more_body": False,
+            })
+        except Exception:
+            # Client already gone; nothing to do.
+            pass
+
     async def _send_error_response(self, status_code: int, message: str, send) -> None:
         """Send error response."""
         error_response = {

@@ -181,6 +181,95 @@ class TestDelayFeature:
         assert response.status_code == 200
         assert end_time - start_time >= 0.4  # Allow some tolerance
 
+class TestSilentDrop:
+    """Test silent-drop behavior (ENG-809879).
+
+    A silent-drop request must:
+    - Be fully read by the server (no HTTP error returned).
+    - Receive *no* HTTP response.
+    - Have its TCP connection closed after the configured sleep.
+    - Not block other concurrent requests (ThreadingHTTPServer).
+    """
+
+    def _expect_silent_drop(self, request_fn):
+        """Run ``request_fn`` and assert the server never sent a response.
+
+        Either the client times out waiting for a response, or the server
+        closes the socket - both manifest as a ``RequestException``.
+        """
+        with pytest.raises(requests.exceptions.RequestException):
+            # Use a client-side timeout shorter than the silent-drop sleep
+            # so that we don't have to wait for the server-side close.
+            request_fn()
+
+    def test_silent_drop_query_param(self, server):
+        """Silent-drop via query parameter never returns a response."""
+        self._expect_silent_drop(
+            lambda: requests.get(
+                f"{BASE_URL}?echo_silent_drop=2000", timeout=0.5
+            )
+        )
+
+    def test_silent_drop_header(self, server):
+        """Silent-drop via header never returns a response."""
+        self._expect_silent_drop(
+            lambda: requests.get(
+                BASE_URL,
+                headers={'X-ECHO-SILENT-DROP': '2000'},
+                timeout=0.5,
+            )
+        )
+
+    def test_silent_drop_closes_connection_after_sleep(self, server):
+        """After the configured sleep, the server actively closes the socket."""
+        start = time.time()
+        with pytest.raises(requests.exceptions.RequestException):
+            # No client-side timeout: rely on the server closing the socket
+            # once the 500ms silent-drop sleep elapses.
+            requests.get(f"{BASE_URL}?echo_silent_drop=500", timeout=10)
+        elapsed = time.time() - start
+        assert elapsed >= 0.4, (
+            f"connection closed too early ({elapsed:.3f}s); "
+            f"server should have slept for ~500ms"
+        )
+        assert elapsed < 5, (
+            f"connection close took too long ({elapsed:.3f}s); "
+            f"server may not be closing the socket after sleep"
+        )
+
+    def test_silent_drop_does_not_block_other_requests(self, server):
+        """A pending silent-drop must not block unrelated requests."""
+        results = {}
+
+        def hung_request():
+            try:
+                requests.get(
+                    f"{BASE_URL}?echo_silent_drop=3000", timeout=5
+                )
+                results['hung'] = 'unexpectedly_succeeded'
+            except requests.exceptions.RequestException:
+                results['hung'] = 'dropped'
+
+        t = threading.Thread(target=hung_request, daemon=True)
+        t.start()
+
+        # Give the silent-drop request a moment to be accepted server-side.
+        time.sleep(0.3)
+
+        start = time.time()
+        response = requests.get(BASE_URL, timeout=2)
+        elapsed = time.time() - start
+
+        assert response.status_code == 200
+        assert elapsed < 1.5, (
+            f"normal request blocked for {elapsed:.3f}s while a silent-drop "
+            f"was in progress; ThreadingHTTPServer is not handling "
+            f"concurrent requests"
+        )
+
+        t.join(timeout=10)
+
+
 class TestFileOperations:
     """Test file operation features"""
     

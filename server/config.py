@@ -43,6 +43,11 @@ class CommandConfig:
     time_header: str = "x-echo-time"
     file_query: str = "echo_file"
     file_header: str = "x-echo-file"
+    # Silent-drop: read the request fully, then sleep N ms and close the
+    # connection without ever sending a response (simulates a backend that
+    # silently drops requests, e.g. for testing client idle timeouts).
+    silent_drop_query: str = "echo_silent_drop"
+    silent_drop_header: str = "x-echo-silent-drop"
 
 
 @dataclass
@@ -164,6 +169,12 @@ class ConfigurationManager:
             time_header=os.getenv('COMMANDS__TIME__HEADER', 'x-echo-time'),
             file_query=os.getenv('COMMANDS__FILE__QUERY', 'echo_file'),
             file_header=os.getenv('COMMANDS__FILE__HEADER', 'x-echo-file'),
+            silent_drop_query=os.getenv(
+                'COMMANDS__SILENTDROP__QUERY', 'echo_silent_drop'
+            ),
+            silent_drop_header=os.getenv(
+                'COMMANDS__SILENTDROP__HEADER', 'x-echo-silent-drop'
+            ),
         )
         
         # Timing controls

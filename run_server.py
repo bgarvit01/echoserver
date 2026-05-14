@@ -231,7 +231,9 @@ def print_configuration(config: ServerConfig) -> None:
     print(f"  Code Header: {config.commands.http_code_header}: 404")
     print(f"  Time Query: ?{config.commands.time_query}=5000")
     print(f"  Time Header: {config.commands.time_header}: 5000")
-    
+    print(f"  Silent-Drop Query: ?{config.commands.silent_drop_query}=120000")
+    print(f"  Silent-Drop Header: {config.commands.silent_drop_header}: 120000")
+
     if config.features.enable_file:
         print(f"  File Query: ?{config.commands.file_query}=/path")
         print(f"  File Header: {config.commands.file_header}: /path")

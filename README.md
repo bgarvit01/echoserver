@@ -25,6 +25,7 @@ All controls support both query parameters and HTTP headers:
 | Environment Body | `?echo_env_body=HOSTNAME` | `X-ECHO-ENV-BODY: HOSTNAME` | Response from environment variable |
 | Custom Headers | `?echo_header=Key:Value,Key2:Value2` | `X-ECHO-HEADER: Key:Value,Key2:Value2` | Add custom response headers (supports duplicates) |
 | Response Delay | `?echo_time=5000` | `X-ECHO-TIME: 5000` | Delay response (milliseconds) |
+| Silent Drop | `?echo_silent_drop=120000` | `X-ECHO-SILENT-DROP: 120000` | Read request fully, sleep N ms, close connection without responding |
 | File Operations | `?echo_file=/path` | `X-ECHO-FILE: /path` | Read file or list directory |
 
 ### Configuration
@@ -57,6 +58,8 @@ All controls support both query parameters and HTTP headers:
 - `COMMANDS__TIME__HEADER`: Delay header name (default: x-echo-time)
 - `COMMANDS__FILE__QUERY`: File operation query parameter (default: echo_file)
 - `COMMANDS__FILE__HEADER`: File operation header name (default: x-echo-file)
+- `COMMANDS__SILENTDROP__QUERY`: Silent-drop query parameter (default: echo_silent_drop)
+- `COMMANDS__SILENTDROP__HEADER`: Silent-drop header name (default: x-echo-silent-drop)
 
 **Feature Toggles:**
 - `ENABLE_LOGS`: Enable request logging (default: true)
@@ -125,6 +128,42 @@ curl http://localhost:80/?echo_file=/tmp  # List directory
 curl http://localhost:80/?echo_file=/etc/hostname  # Read file
 curl -H "X-ECHO-FILE: /usr" http://localhost:80
 ```
+
+### Silent Drop (simulate a hung backend)
+
+Tell the server to read the request fully, then sleep for N ms and close the
+TCP connection **without ever sending an HTTP response**. This simulates a
+backend (e.g. Prism Gateway) that silently drops requests and is useful for
+exercising client-side idle-timeout / connection-cleanup paths
+(see [ENG-809879](https://jira.nutanix.com/browse/ENG-809879)).
+
+```bash
+# Drop the request and hold the connection open for 120 seconds, then close.
+# (Bump --max-delay above 60000 first so the 120000ms value isn't clamped.)
+python run_server.py --port 19080 --max-delay 300000 &
+
+curl -v --max-time 130 \
+  "http://127.0.0.1:19080/?echo_silent_drop=120000"
+
+# Header form (equivalent):
+curl -v --max-time 130 \
+  -H "X-ECHO-SILENT-DROP: 120000" \
+  http://127.0.0.1:19080/
+
+# Shorthand: "true" / "1" / "yes" / "on" use the configured --max-delay.
+curl -v -H "X-ECHO-SILENT-DROP: true" http://127.0.0.1:19080/
+```
+
+Notes:
+- The HTTP/1.1 server uses `ThreadingHTTPServer`, so concurrent silent-drop
+  requests do not block one another - this matches the per-connection thread
+  model used by the reference Python silent-drop server.
+- The sleep is clamped by `CONTROLS__TIMES__MAX` / `--max-delay` (hard cap
+  300000ms / 5 minutes), so make sure to raise the limit before requesting
+  long drops.
+- On HTTP/2 (`--enable-http2`) the server cannot truly close the raw socket
+  from the ASGI layer, so it sleeps and then sends an empty `502` with
+  `Connection: close` instead. Use HTTP/1.1 if you need a true silent drop.
 
 ### Combined Features
 ```bash
